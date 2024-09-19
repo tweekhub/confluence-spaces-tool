@@ -6,9 +6,8 @@
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=coverage)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
 
-
+### Not Admin? Not a problem, Be the Super User for your Confluence Space!
 ## Preface
-
 The Confluence Spaces Tool is a powerful utility designed to automate the copying of spaces between different Confluence instances. It supports both Confluence Server and Cloud versions and can perform various tasks such as fetching, creating, and updating pages, managing attachments, and synchronizing content between Confluence spaces. This tool is particularly useful for teams aiming to streamline documentation processes or migrate content between instances.
 
 ### Key Functionalities:
