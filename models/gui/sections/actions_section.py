@@ -83,7 +83,6 @@ class ActionsSection:
         label.grid(row=row, column=col, padx=5, pady=5, sticky=sticky)
 
         # Combobox with the list of option texts
-        options = list(action["options"].keys())
         option_texts = [option_data["text"] for option_data in action["options"].values()]
         combo = ttk.Combobox(parent, values=option_texts, state="readonly")
         combo.grid(row=row, column=col + 1, padx=5, pady=5, sticky=sticky)
