@@ -64,7 +64,7 @@ class ActionsSection:
         self.create_combobox_with_button(action_frame, "save", 0, 6,"e")
         self.create_combobox_with_button(action_frame, "download", 0, 9,"e")
         # Log output section
-        log_output = ScrolledText(self.parent, wrap=tk.WORD, width=150, height=20)
+        log_output = ScrolledText(self.parent, wrap=tk.WORD, width=100, height=20)
         log_output.grid(row=2, column=0, columnspan=4, padx=5, pady=10, sticky="ew")
         logger.set_text_widget(text_widget=log_output)
         self.update_button_state("create_pages","disabled","disabled")
@@ -80,16 +80,16 @@ class ActionsSection:
 
         # Label for the action
         label = ttk.Label(parent, text=action["text"])
-        label.grid(row=row, column=col, padx=5, pady=5, sticky=sticky)
+        label.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
 
         # Combobox with the list of option texts
         option_texts = [option_data["text"] for option_data in action["options"].values()]
-        combo = ttk.Combobox(parent, values=option_texts, state="readonly")
-        combo.grid(row=row, column=col + 1, padx=5, pady=5, sticky=sticky)
+        combo = ttk.Combobox(parent, values=option_texts, state="readonly",width="17")
+        combo.grid(row=row, column=col + 1, padx=5, pady=5, sticky="nsew")
 
         # Execute button
         button = tk.Button(parent, text="Execute", command=lambda c=combo, k=action_key: self.execute_selected_option(c, k))
-        button.grid(row=row, column=col + 2, padx=5, pady=5, sticky=sticky)
+        button.grid(row=row, column=col + 2, padx=5, pady=5, sticky="nsew")
 
         # Save the button and combobox reference
         self.buttons[action_key] = (combo, button)

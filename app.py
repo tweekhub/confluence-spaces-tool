@@ -1,4 +1,5 @@
 from utils.logger import Logger
+from typing import Optional
 from api.client import ConfluenceAPIClient
 from browser.selenium_driver import ConfluenceBrowserClient
 from config.config_loader import ConfluenceConfig
@@ -37,7 +38,7 @@ class ConfluenceSpacesApp:
         self.source_instance = self.app_config.find_instance_by_key("source")
         self.source_api_client = ConfluenceAPIClient(instance_config=self.source_instance,api_config=self.app_config.api_config_data)
         self.source_form = SettingsForm(self.settings_frame,title="Source Confluence",row=1,column=0,sticky="w",config=self.source_instance.to_dict(),update_config=lambda: threading.Thread(target=self.update_source_instance).start())
-        self.source_stats = StatsTable(parent=self.logs_frame, title="Source Stats",row=4, column=0, padx=5, pady=5, sticky="nsew")
+        self.source_stats = StatsTable(parent=self.logs_frame, title="Source Space Details",row=4, column=0, padx=5, pady=5, sticky="nsew")
         self.source_stats.update_stats({"space_key": self.source_instance.space_key,"root_page_id": self.source_instance.root_page_id,"current_user_email": self.source_instance.credentials.email})
 
         # Target
@@ -46,7 +47,7 @@ class ConfluenceSpacesApp:
         self.target_instance = self.app_config.find_instance_by_key("target")
         self.target_api_client = ConfluenceAPIClient(instance_config=self.target_instance,api_config=self.app_config.api_config_data)
         self.target_form = SettingsForm(self.settings_frame,title="Target Confluence", row=1,column=1,sticky="e",config=self.target_instance.to_dict(),update_config=lambda: threading.Thread(target=self.update_target_instance).start())
-        self.target_stats = StatsTable(parent=self.logs_frame, title="Target Stats", row=5, column=0, padx=5, pady=5, sticky="nsew")
+        self.target_stats = StatsTable(parent=self.logs_frame, title="Target Space Details", row=5, column=0, padx=5, pady=5, sticky="nsew")
         self.target_stats.update_stats({"space_key": self.target_instance.space_key,"root_page_id": self.target_instance.root_page_id,"current_user_email": self.target_instance.credentials.email})
 
         self.actions_section.update_action_command("fetch_pages","source",{"command": lambda: threading.Thread(target=self.fetch_source_tree).start()})

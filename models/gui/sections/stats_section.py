@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+from . import logger
 class StatsTable:
     DEFAULTS = {
         "root_page_title": "n/a",
@@ -8,9 +8,9 @@ class StatsTable:
         "space_key": "n/a",
         "space_id": "n/a",
         "current_user_email": "n/a",
-        "current_user_groups": [],
-        "total_attachments_created": "",
-        "total_pages_created": "",
+        "current_user_groups": ["n/a"],
+        "total_attachments_created": "n/a",
+        "total_pages_created": "n/a",
         "total_http_requests": "n/a",
         "successful_http_requests": "n/a",
         "failed_http_requests": "n/a",
@@ -26,6 +26,7 @@ class StatsTable:
         self.sticky = sticky
         self.config = config or self.DEFAULTS
         self.create_section()
+        
 
     def create_section(self):
         self.frame = ttk.LabelFrame(self.parent, text=self.title, padding=5)
@@ -47,6 +48,10 @@ class StatsTable:
 
         for i, (key, value) in enumerate(self.config.items()):
             if key == "current_user_groups":
+                continue
+            if key == "total_pages_created" and self.title.lower().split(" ")[0] == "source":
+                continue
+            if key == "total_attachments_created" and self.title.lower().split(" ")[0] == "source":
                 continue
 
             # Convert underscored keys to display names with spaces

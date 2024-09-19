@@ -127,7 +127,7 @@ Alternatively, You can also setup a developer environment for this tool by follo
    ```bash
       # install browser if required
       chmod +x ./scripts/install_browser.sh
-      ./scripts/install_browser.sh
+      .
    ```
    Chrome is used for web automation tasks in the tool.
 

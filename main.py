@@ -6,7 +6,7 @@ import argparse
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Confluence Space SpacesAssistant")
-    parser.add_argument("--config-file", default="./config.yaml", help="Specify the path to the configuration file")
+    parser.add_argument("--config-file", default="./configuration.yaml", help="Specify the path to the configuration file")
     parser.add_argument("--api-config-file", default="./confluence-api.json", help="Specify the path to the API configuration file")
     parser.add_argument("--browser-config-file", default="./confluence-elements.json", help="Specify the path to the UI elements configuration file")
     parser.add_argument("--download-dir", default="downloads", type=str, help="Specify the directory to download files")
@@ -26,7 +26,7 @@ def main():
 
     root = tk.Tk()
     root.title("Confluence SpacesTool")
-    window_width = 1345
+    window_width = 1320
     window_height = 915
     # Set the initial window size
     root.geometry(f"{window_width}x{window_height}")

@@ -41,37 +41,29 @@ class SettingsForm:
         self.create_section()
 
     def create_section(self):
-        frame = ttk.LabelFrame(self.root, text=self.title, padding=15)
-        frame.grid(row=self.row, column=self.column, padx=self.padx, pady=self.pady, sticky="nsew")
+        frame = ttk.LabelFrame(self.root, text=self.title)
+        frame.grid(row=self.row, column=self.column, padx=self.padx, pady=self.pady, sticky=self.sticky)
 
         # Helper function for consistent padding
-        def create_label_entry(label_text, row, var_name, width=50, show=None, state="normal"):
+        def create_label_entry(label_text, row, var_name, width=35, show=None, state="normal"):
             ttk.Label(frame, text=f'{label_text}: ').grid(row=row, column=0, sticky="e", padx=5, pady=5)
             entry = ttk.Entry(frame, width=width, show=show, state=state)
             entry.grid(row=row, column=1, padx=5, pady=5, sticky="w")
             entry.insert(0, self.config.get(var_name, '') if isinstance(self.config.get(var_name, ''), str) else "")
             return entry
 
-        # Error Label Helper Function
-        def create_error_label(row):
-            label = tk.Label(frame, text="", fg="red", font=("Arial", 8))
-            label.grid(row=row, column=2, padx=5, pady=5)
-            return label
-
         # Name Field
         self.name_entry = create_label_entry('Name', 0, 'name')
-        self.name_error_label = create_error_label(0)
 
         # Confluence Type
         ttk.Label(frame, text="Confluence Type:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
         self.confluence_type = tk.StringVar(value=self.config.get('confluence_type', 'server'))
-        self.confluence_type_combobox = ttk.Combobox(frame, textvariable=self.confluence_type, values=["server", "cloud"], state="readonly", width=48)
+        self.confluence_type_combobox = ttk.Combobox(frame, textvariable=self.confluence_type, values=["server", "cloud"], state="readonly", width=35)
         self.confluence_type_combobox.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         self.confluence_type_combobox.bind("<<ComboboxSelected>>", self.update_api_token_visibility)
 
         # Site URL, Home Path, Space Key, Root Page ID, Include Label, Exclude IDs
         self.site_entry = create_label_entry('Site URL', 2, 'site_url')
-        self.site_error_label = create_error_label(2)
 
         self.home_path_entry = create_label_entry('Homepage Path', 3, 'home_path')
         self.space_key_entry = create_label_entry('Space Key', 4, 'space_key')
@@ -79,32 +71,31 @@ class SettingsForm:
         self.label_entry = create_label_entry('Include Label' if self.title.lower().startswith('source') else "Automation Label", 6, 'label')
 
         ttk.Label(frame, text="Exclude IDs:").grid(row=7, column=0, sticky="e", padx=5, pady=5)
-        self.exclude_ids_entry = ttk.Entry(frame, width=50)
+        self.exclude_ids_entry = ttk.Entry(frame, width=35)
         self.exclude_ids_entry.grid(row=7, column=1, padx=5, pady=5, sticky="w")
         self.exclude_ids_entry.insert(0, ', '.join(map(str, self.config.get('exclude_ids', []))))
 
         # Fetch Pages Limit
         ttk.Label(frame, text="Fetch Pages Limit:").grid(row=8, column=0, sticky="e", padx=5, pady=5)
-        self.fetch_pages_limit_entry = ttk.Entry(frame, width=50)
+        self.fetch_pages_limit_entry = ttk.Entry(frame, width=35)
         self.fetch_pages_limit_entry.insert(0, self.config.get('fetch_pages_limit', ''))
-        self.fetch_pages_limit_entry.grid(row=8, column=1, padx=5, pady=5)
+        self.fetch_pages_limit_entry.grid(row=8, column=1, padx=5, pady=5, sticky="w")
 
         # Fetch Attachments Limit
         ttk.Label(frame, text="Fetch Attachments Limit:").grid(row=9, column=0, sticky="e", padx=5, pady=5)
-        self.fetch_attachments_limit_entry = ttk.Entry(frame, width=50)
+        self.fetch_attachments_limit_entry = ttk.Entry(frame, width=35)
         self.fetch_attachments_limit_entry.insert(0, self.config.get('fetch_attachments_limit', ''))
-        self.fetch_attachments_limit_entry.grid(row=9, column=1, padx=5, pady=5)
+        self.fetch_attachments_limit_entry.grid(row=9, column=1, padx=5, pady=5, sticky="w")
 
         # Credentials Section
         ttk.Label(frame, text="Email:").grid(row=10, column=0, sticky="e", padx=5, pady=5)
-        self.email_entry = ttk.Entry(frame, width=50)
+        self.email_entry = ttk.Entry(frame, width=35)
         self.email_entry.grid(row=10, column=1, padx=5, pady=5, sticky="w")
         self.email_entry.insert(0, self.config['credentials']['email'])
-        self.email_error_label = create_error_label(10)
 
         # Password
         ttk.Label(frame, text="Password:").grid(row=11, column=0, sticky="e", padx=5, pady=5)
-        self.password_entry = ttk.Entry(frame, width=50, show="*" if not self.config['credentials']['show_password'] else "")
+        self.password_entry = ttk.Entry(frame, width=35, show="*" if not self.config['credentials']['show_password'] else "")
         self.password_entry.grid(row=11, column=1, padx=5, pady=5, sticky="w")
         self.password_entry.insert(0, self.config['credentials']['password'])
         self.show_password_checkbox_var = tk.BooleanVar(value=self.config['credentials']['show_password'])
@@ -113,7 +104,7 @@ class SettingsForm:
 
         # MFA Secret Key
         ttk.Label(frame, text="MFA Secret Key:").grid(row=13, column=0, sticky="e", padx=5, pady=5)
-        self.mfa_entry = ttk.Entry(frame, width=50)
+        self.mfa_entry = ttk.Entry(frame, width=35)
         self.mfa_entry.grid(row=13, column=1, padx=5, pady=5, sticky="w")
         self.mfa_entry.insert(0, self.config['credentials']['mfa_secret_key'])
         self.mfa_entry.config(state='normal' if self.config['credentials']['mfa_enabled'] else 'disabled')
@@ -124,14 +115,14 @@ class SettingsForm:
         # REST Auth Type
         ttk.Label(frame, text="REST Auth Type:").grid(row=15, column=0, sticky="e", padx=5, pady=5)
         self.rest_auth_type = tk.StringVar(value=self.config['credentials']['rest_auth_type'])
-        self.rest_auth_type_combobox = ttk.Combobox(frame, textvariable=self.rest_auth_type, values=self.REST_AUTH_TYPES, state="readonly")
+        self.rest_auth_type_combobox = ttk.Combobox(frame, textvariable=self.rest_auth_type, values=self.REST_AUTH_TYPES, state="readonly",width=35)
         self.rest_auth_type_combobox.grid(row=15, column=1, padx=5, pady=5, sticky="w")
         self.rest_auth_type_combobox.bind("<<ComboboxSelected>>", self.update_api_token_visibility)
         self.update_rest_auth_types()
 
         # API Token
         ttk.Label(frame, text="API Token:").grid(row=16, column=0, sticky="e", padx=5, pady=5)
-        self.api_token_entry = ttk.Entry(frame, width=50)
+        self.api_token_entry = ttk.Entry(frame, width=35)
         self.api_token_entry.grid(row=16, column=1, padx=5, pady=5, sticky="w")
         self.api_token_entry.insert(0, self.config['credentials']['api_token'])
         self.api_token_entry.config(state='normal' if self.rest_auth_type.get() == "header_auth" else 'disabled')
@@ -148,60 +139,58 @@ class SettingsForm:
 
     def validate_fields(self):
         valid = True
-        self.clear_error_labels()
 
         # Validate Name
         name = self.name_entry.get().strip()
         cleaned_name = re.sub(r'[^a-zA-Z0-9]', '', name)  # Remove special characters and spaces
         if not cleaned_name:
-            self.name_error_label.config(text="Name is required.")
+            messagebox.showerror("Error","Name Required")
             valid = False
 
         # Validate Site URL
         site_url = self.site_entry.get().strip()
         if not site_url:
-            self.site_error_label.config(text="Site URL is required.")
+            messagebox.showerror("Error","Site URL Required")
             valid = False
         elif not self.validate_url(site_url):
-            self.site_error_label.config(text="Invalid URL format.")
+            messagebox.showerror("Error","Invalid URL")
             valid = False
 
         # Validate Path
         path = self.home_path_entry.get().strip()
         if not path:
-            self.path_error_label.config(text="Path is required.")
+            messagebox.showerror("Error","Path Required")
             valid = False
         elif not self.validate_path(path):
-            self.path_error_label.config(text="Invalid path format.")
+            messagebox.showerror("Error","Invalid Path")
             valid = False
 
         # Validate Space Key
         space_key = self.space_key_entry.get().strip()
         if not space_key or not space_key.isalnum():
-            self.space_key_error_label.config(text="Space Key must be alphanumeric.")
+            messagebox.showerror("Error","Incorrect Space Key")
             valid = False
 
         # Validate Root Page ID
         root_page_id = self.root_page_id_entry.get().strip()
         if not root_page_id or not root_page_id.isdigit():
-            self.root_page_id_error_label.config(text="Root Page ID must be a multi-digit number.")
+            messagebox.showerror("Error","Root Page ID Invalid")
             valid = False
 
         # Validate Exclude IDs
         exclude_ids = self.exclude_ids_entry.get().strip()
         if exclude_ids and not self.validate_exclude_ids(exclude_ids):
-            self.exclude_ids_error_label.config(text="Exclude IDs must be a list of digits separated by commas.")
+            messagebox.showerror("Error","Exclude IDs Invalid")
             valid = False
 
         # Validate Email
         email = self.email_entry.get().strip()
         if not email:
-            self.email_error_label.config(text="Email is required.")
+            messagebox.showerror("Error","Email Required.")
             valid = False
         elif not self.validate_email(email):
-            self.email_error_label.config(text="Invalid email format.")
+            messagebox.showerror("Error","Email Invalid")
             valid = False
-
         return valid
 
     def validate_url(self, url):
@@ -223,11 +212,6 @@ class SettingsForm:
         # Regex for validating a list of digits separated by commas
         exclude_ids_regex = r'^(\d+)(,\d+)*$'
         return re.match(exclude_ids_regex, exclude_ids) is not None
-
-    def clear_error_labels(self):
-        self.name_error_label.config(text="")
-        self.site_error_label.config(text="")
-        self.email_error_label.config(text="")
 
     def set_edit_mode(self, edit_mode):
         self.edit_mode = edit_mode

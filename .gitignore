@@ -1,11 +1,12 @@
 config.yaml
 config.private
 *.private
-__pycache__/ 
 .pydeps
+.pyenv
 tests/
 tree_*.txt
 downloads/
+__pycache__/ 
 
 downloads_attachments/
 # Python related paths to ignore

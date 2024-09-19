@@ -7,8 +7,9 @@ ENV BROWSER_CONFIG_FILE=confluence-elements.json
 ENV DOWNLOAD_DIR=/app/downloads
 ENV LOG_LEVEL=info
 ENV LOG_FILE=confluence-app.log
+ENV USER=bot
 LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-spaces-tool
-LABEL org.opencontainers.image.description="A tool to manage your confluence pages across confluence instances"
+LABEL org.opencontainers.image.description="A tool to manage your confluence pages across confluence spaces"
 LABEL org.opencontainers.image.licenses=Apache
 
 # Install necessary packages
@@ -22,6 +23,7 @@ RUN apk update && apk add --no-cache \
     ttf-dejavu \
     wget \
     xvfb \
+    shadow \
     && apk add --no-cache --virtual .build-deps gcc musl-dev python3-tkinter \
     && pip install --upgrade pip
 
@@ -34,10 +36,11 @@ RUN sed -i 's/sudo //g' /app/scripts/install_browser.sh && \
     chmod +x /app/scripts/install_browser.sh && \
     /app/scripts/install_browser.sh && \
     pip install -r requirements.txt && \
-    chown -R bot:bot /app
+    useradd -m -s /bin/bash "$USER"  && \
+    chown -R $USER:$USER /app
 
 # Switch to the non-root user
-USER bot
+USER $USER
 
 # Set DISPLAY environment variable
 ENV DISPLAY=:99
