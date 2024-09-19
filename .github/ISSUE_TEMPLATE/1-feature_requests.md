@@ -1,6 +1,6 @@
 ---
 name: Feature Requests
-about: Suggest an enhancement or new feature for the Confluence Migration Tool
+about: Suggest an enhancement or new feature for the Confluence SpacesTool
 ---
 
 <!-- Please only use this template for submitting feature requests -->

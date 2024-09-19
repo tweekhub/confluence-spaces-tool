@@ -1,4 +1,4 @@
-# Confluence Spaces Migration Tool 
+# Confluence Spaces Tool 
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=bugs)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
@@ -9,7 +9,7 @@
 
 ## Preface
 
-The Confluence Spaces Migration Tool is a powerful utility designed to automate the copying of spaces between different Confluence instances. It supports both Confluence Server and Cloud versions and can perform various tasks such as fetching, creating, and updating pages, managing attachments, and synchronizing content between Confluence spaces. This tool is particularly useful for teams aiming to streamline documentation processes or migrate content between instances.
+The Confluence Spaces Tool is a powerful utility designed to automate the copying of spaces between different Confluence instances. It supports both Confluence Server and Cloud versions and can perform various tasks such as fetching, creating, and updating pages, managing attachments, and synchronizing content between Confluence spaces. This tool is particularly useful for teams aiming to streamline documentation processes or migrate content between instances.
 
 ### Key Functionalities:
 - Build a hierarchical structure of pages, including details like page ID, title, labels, attachments, and child page IDs. The root page of this structure will be determined by an ID provided via the GUI settings or the `config.yaml` file.
@@ -24,7 +24,7 @@ The Confluence Spaces Migration Tool is a powerful utility designed to automate 
 - Exclude specific source pages by providing a list of Page IDs, which will be ignored along with their subpages.
 - Add an automation label to pages created in the destination Confluence space for tracking.
    - This label allows future tool executions to check if a page in the destination has been created automatically.
-- Implement logging and error handling for a smooth migration process.
+- Implement logging and error handling for a smooth Spacesprocess.
 - Supports rest api v1 and v2 for confluence Cloud and rest api v1 for confluence servers.
    * currently this tool uses rest api v2 to get,create or update pages in confluence cloud versions, all other requests uses rest api v1 for cloud as well as for server versions.
 
@@ -70,7 +70,7 @@ You can configure the credentials, source and destination details in the gui of 
 
 ## Usage
 
-The Confluence Migration Tool can be run with various command-line arguments to control its behavior. Here's the basic usage:
+The Confluence SpacesTool can be run with various command-line arguments to control its behavior. Here's the basic usage:
 
 ```bash
     python3 main.py [options]
@@ -81,9 +81,9 @@ The Confluence Migration Tool can be run with various command-line arguments to 
 - `--config-file`: Specify the path to the configuration file (default: "./config.yaml")
 - `--api-config-file`: Specify the path to the API configuration file (default: "./confluence-api.json")
 - `--browser-config-file`: Specify the path to the UI elements configuration file (default: "./confluence-elements.json")
-- `--log-level`: Set the logging level for the migration process (choices: "debug", "info", "warning", "error") (default: "info")
-- `--log-file`: Specify the path to the log file for the migration process (default: "confluence-migration.log")
-- `--version`: Prints out the version for this confluence migration tool. 
+- `--log-level`: Set the logging level for the Spacesprocess (choices: "debug", "info", "warning", "error") (default: "info")
+- `--log-file`: Specify the path to the log file for the Spacesprocess (default: "confluence-migration.log")
+- `--version`: Prints out the version for this confluence Spacestool. 
 
 ### Examples:
 1. Create pages in the target confluence space, by reading the source tree first and then executing the create pages action.
@@ -99,7 +99,7 @@ The Confluence Migration Tool can be run with various command-line arguments to 
 
 ## Logging
 
-The migration tool logs its activities to both the console and a file. By default, the log file is named `confluence-migration.log`, but this can be changed using the `--log-file` option. The logging level can be adjusted using the `--log-level` option, with available choices being "debug", "info", "warning", and "error". The default log level is "info".
+The Spacestool logs its activities to both the console and a file. By default, the log file is named `confluence-migration.log`, but this can be changed using the `--log-file` option. The logging level can be adjusted using the `--log-level` option, with available choices being "debug", "info", "warning", and "error". The default log level is "info".
 
 For example, to set a custom log file and increase the verbosity to debug level:
 

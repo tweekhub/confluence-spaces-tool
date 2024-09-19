@@ -5,14 +5,14 @@ from tkinter import ttk
 import argparse
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Confluence Space Migration Assistant")
+    parser = argparse.ArgumentParser(description="Confluence Space SpacesAssistant")
     parser.add_argument("--config-file", default="./config.yaml", help="Specify the path to the configuration file")
     parser.add_argument("--api-config-file", default="./confluence-api.json", help="Specify the path to the API configuration file")
     parser.add_argument("--browser-config-file", default="./confluence-elements.json", help="Specify the path to the UI elements configuration file")
     parser.add_argument("--download-dir", default="downloads", type=str, help="Specify the directory to download files")
 
     parser.add_argument("--log-level", default="info", choices=["debug", "info", "warning", "error"], help="Set the logging levels")
-    parser.add_argument("--log-file", default="confluence-migration.log", help="Specify the path to the log file for the migration process")
+    parser.add_argument("--log-file", default="confluence-migration.log", help="Specify the path to the log file for the Spacesprocess")
     parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
     return parser.parse_args()
 
@@ -25,7 +25,7 @@ def main():
     logger.set_log_level(log_level=kwargs.pop('log_level').upper())
 
     root = tk.Tk()
-    root.title("Confluence Migration Tool")
+    root.title("Confluence SpacesTool")
     window_width = 1345
     window_height = 915
     # Set the initial window size

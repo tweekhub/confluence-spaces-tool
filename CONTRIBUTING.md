@@ -1,17 +1,17 @@
-# Contributing to Confluence Migration Tool
+# Contributing to Confluence SpacesTool
 
-Thank you for your interest in contributing to Confluence Migration Tool! We welcome all people who want to contribute in a healthy and constructive manner within our community. To help us create a safe and positive community experience for all, we require all participants to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
+Thank you for your interest in contributing to Confluence SpacesTool! We welcome all people who want to contribute in a healthy and constructive manner within our community. To help us create a safe and positive community experience for all, we require all participants to adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-This document is a guide to help you through the process of contributing to Confluence Migration Tool.
+This document is a guide to help you through the process of contributing to Confluence SpacesTool.
 
 ## Become a contributor
 
-You can contribute to Confluence Migration Tool in several ways. Here are some examples:
+You can contribute to Confluence SpacesTool in several ways. Here are some examples:
 
-- Contribute to the Confluence Migration Tool codebase.
+- Contribute to the Confluence SpacesTool codebase.
 - Report and triage bugs.
 - Write technical documentation and blog posts, for users and contributors.
-- [Help others by answering questions about Confluence Migration Tool.](https://github.com/orgs/community/discussions/139070)
+- [Help others by answering questions about Confluence SpacesTool.](https://github.com/orgs/community/discussions/139070)
 
 For more ways to contribute, check out the [Open Source Guides](https://opensource.guide/how-to-contribute/).
 
@@ -25,7 +25,7 @@ Follow the issue template and add additional information that will help us repli
 
 ### Suggest enhancements
 
-If you have an idea of how to improve Confluence Migration Tool, submit a [feature request](https://github.com/atonomic/confluence-spaces-tool/issues/new?assignees=&labels=type%2Ffeature-request&projects=&template=1-feature_requests.md).
+If you have an idea of how to improve Confluence SpacesTool, submit a [feature request](https://github.com/atonomic/confluence-spaces-tool/issues/new?assignees=&labels=type%2Ffeature-request&projects=&template=1-feature_requests.md).
 
 ### Write documentation
 
@@ -35,7 +35,7 @@ Once the bug is fixed, or the feature is added, then document it accordingly in 
 
 If you have a question and you can't find the answer in the [Readme File](README.md), the next step is to ask it on the [community discussions](https://github.com/orgs/community/discussions/139070).
 
-It's important to us to help these users, and we'd love your help. Sign up to GitHub, and start helping other Confluence Migration Tool users by answering their questions.
+It's important to us to help these users, and we'd love your help. Sign up to GitHub, and start helping other Confluence SpacesTool users by answering their questions.
 
 ### Developer Installation
 
