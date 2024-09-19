@@ -33,10 +33,8 @@ WORKDIR /app
 RUN sed -i 's/sudo //g' /app/scripts/install_browser.sh && \
     chmod +x /app/scripts/install_browser.sh && \
     /app/scripts/install_browser.sh && \
-    pip install -r requirements.txt
-
-# Change ownership of the application directory to the new user
-RUN chown -R bot:bot /app
+    pip install -r requirements.txt && \
+    chown -R bot:bot /app
 
 # Switch to the non-root user
 USER bot
