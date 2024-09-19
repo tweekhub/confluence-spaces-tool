@@ -1,0 +1,59 @@
+name: New Bug Report
+description: File a bug report
+title: "Short description of bug"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        Please try to give your issue a good title. Try using the product-area where you are having an issue and a brief description of the problem. Like this:
+        - `Create Pages: Cannot use Confluence Cloud as source when creating pages` or
+        - `Copy Pages (Source View): The pages content being copied does not work as expected `
+
+  - type: dropdown
+    attributes:
+      label: Confluence Type?
+      description: Which confluence type?
+      options:
+        - Server
+        - Cloud
+    validations:
+      required: false
+
+  - type: input
+    attributes:
+      label: Confluence Version ?
+      description: "Which version of confluence cloud or server are you using?"
+      placeholder: "ex. confluence server 9.0 etc..."
+
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: "**Hot Tip:** take screenshot and attach it here."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Did this work before?
+      description: "If this worked before, what Grafana version worked correctly?"
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: How do we reproduce it?
+      placeholder: "Steps to reproduce..."
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true

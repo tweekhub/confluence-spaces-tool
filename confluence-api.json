@@ -1,0 +1,125 @@
+{
+    "server": {
+        "v1": {
+            "rest":{
+                "base": "/rest/api/content"
+            },
+            "space": {
+                "get": "/rest/api/space/{spaceKey}",
+                "create": "/rest/api/space",
+                "list": "/rest/api/space"
+            },
+            "content": {
+                "get": "/rest/api/content/{contentId}",
+                "create": "/rest/api/content",
+                "update": "/rest/api/content/{contentId}",
+                "delete": "/rest/api/content/{contentId}",
+                "search": "/rest/api/content",
+                "restrictions": "/rest/api/content/{contentId}/restriction/byOperation"
+            },
+            "child": {
+                "get": "/rest/api/content/{parentId}/child/page"
+            },
+            "attachment": {
+                "get": "/rest/api/content/{contentId}/child/attachment",
+                "create": "/rest/api/content/{contentId}/child/attachment",
+                "update": "/rest/api/content/{contentId}/child/attachment/{attachmentId}",
+                "download": "/download/attachments/{contentId}/{fileName}"
+            },
+            "label": {
+                "get": "/rest/api/content/{contentId}/label",
+                "add": "/rest/api/content/{contentId}/label",
+                "delete": "/rest/api/content/{contentId}/label/{label}"
+            },
+            "export": {
+                "pdf": "/spaces/flyingpdf/pdfpageexport.action",
+                "word": "/exportword"
+            },
+            "source":{
+                "view": "/plugins/viewsource/viewpagesrc.action"
+            },
+            "page":{
+                "edit" : "/pages/resumedraft.action"
+            },
+            "user":{
+                "groups": "/rest/api/group"
+            }
+        }
+    },
+    "cloud": {
+        "v1": {
+            "rest":{
+                "base": "/wiki/rest/api/content"
+            },
+            "space": {
+                "get": "/wiki/rest/api/space/{spaceKey}",
+                "create": "/wiki/rest/api/space",
+                "list": "/wiki/rest/api/space"
+            },
+            "content": {
+                "get": "/wiki/rest/api/content/{contentId}",
+                "create": "/wiki/rest/api/content",
+                "update": "/wiki/rest/api/content/{contentId}",
+                "delete": "/wiki/rest/api/content/{contentId}",
+                "search": "/wiki/rest/api/content/search",
+                "restrictions": "/wiki/rest/api/content/{contentId}/restriction/byOperation"
+            },
+            "child": {
+                "get": "/wiki/rest/api/content/{parentId}/child/page"
+            },
+            "attachment": {
+                "get": "/wiki/rest/api/content/{contentId}/child/attachment",
+                "create": "/wiki/rest/api/content/{contentId}/child/attachment",
+                "update": "/wiki/rest/api/content/{contentId}/child/attachment/{attachmentId}",
+                "download": "/wiki/download/attachments/{contentId}/{fileName}"
+            },
+            "label": {
+                "get": "/wiki/rest/api/content/{contentId}/label",
+                "add": "/wiki/rest/api/content/{contentId}/label",
+                "delete": "/wiki/rest/api/content/{contentId}/label/{label}"
+            },
+            "export": {
+                "pdf": "/wiki/spaces/flyingpdf/pdfpageexport.action",
+                "word": "/wiki/exportword"
+            },
+            "source":{
+                "view": "/wiki/plugins/viewsource/viewpagesrc.action"
+            },
+            "page":{
+                "edit" : "/wiki/pages/resumedraft.action"
+            },
+            "user":{
+                "groups": "/wiki/rest/api/group"
+            }
+        },
+        "v2": {
+            "space": {
+                "get": "/wiki/api/v2/spaces/{spaceId}",
+                "create": "/wiki/api/v2/spaces",
+                "list": "/wiki/api/v2/spaces"
+            },
+            "content": {
+                "get": "/wiki/api/v2/pages/{contentId}",
+                "create": "/wiki/api/v2/pages",
+                "update": "/wiki/api/v2/pages/{contentId}",
+                "delete": "/wiki/api/v2/pages/{contentId}",
+                "search": "/wiki/api/v2/search",
+                "restrictions": "/wiki/api/v2/pages/{contentId}/restriction/byOperation"
+            },
+            "attachment": {
+                "get": "/custom-content/{contentId}/attachments",
+                "create": "/wiki/api/v2/attachments",
+                "update": "/wiki/api/v2/attachments/{attachmentId}",
+                "download": "/wiki/api/v2/attachments/{attachmentId}/download"
+            },
+            "label": {
+                "get": "/wiki/api/v2/pages/{contentId}/labels",
+                "add": "/wiki/api/v2/pages/{contentId}/labels",
+                "delete": "/wiki/api/v2/pages/{contentId}/labels/{labelId}"
+            },
+            "page":{
+                "edit" : "/wiki/spaces/{spaceKey}/pages/edit-v2/{contentId}"
+            }
+        }
+    }
+}

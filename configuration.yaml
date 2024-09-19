@@ -1,0 +1,38 @@
+source:
+  name: "source"
+  confluence_type: Confluence Server # Valid options: ConfluenceCloud, Confluence Cloud, cloud, Confluence Server ,ConfluenceServer,server
+  site_url: ""
+  home_path: ""
+  space_key: ""
+  root_page_id: ""
+  include_label: ""
+  exclude_ids: []
+  fetch_pages_limit: ""
+  fetch_attachments_limit: ""
+  credentials:
+    email: ""
+    password: ""
+    show_password: False
+    mfa_enabled: False
+    mfa_secret_key: ""
+    api_token: ""
+    rest_auth_type: "header_auth" # Valid options: cookies_auth header_auth basic_auth defaults to basic_auth
+target:
+  name: "target"
+  confluence_type: Confluence Cloud # Valid options: ConfluenceCloud, Confluence Cloud, cloud, Confluence Server ,ConfluenceServer,server
+  site_url: ""
+  home_path: ""
+  space_key: ""
+  root_page_id: ""
+  include_label: ""
+  exclude_ids: []
+  fetch_pages_limit: ""
+  fetch_attachments_limit: ""
+  credentials:
+    email: ""
+    password: ""
+    show_password: False
+    mfa_enabled: False
+    mfa_secret_key: ""
+    api_token: ""
+    rest_auth_type: "basic_auth" # Valid options: cookies_auth header_auth basic_auth defaults to basic_auth

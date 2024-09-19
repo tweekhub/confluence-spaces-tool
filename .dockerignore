@@ -1,0 +1,33 @@
+# Configuration files to ignore
+config.yaml
+config.private
+*.private
+
+# Python related paths to ignore
+__pycache__/
+.pydeps
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+.env
+*.log
+.coverage
+htmlcov/
+*.log*
+
+# Specific file patterns to ignore
+tree_*.txt
+downloads/
+downloads_attachments/
+tree_*
+
+# Test files and directories to ignore
+tests/

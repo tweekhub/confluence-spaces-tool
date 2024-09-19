@@ -1,0 +1,142 @@
+{
+    "confluence": {
+      "server": {
+        "login_page": [
+          {
+            "element_type": "textfield",
+            "selector_type": "ID",
+            "selector_value": "os_username",
+            "action": "USE_EMAIL",
+            "post_action": ""
+          },
+          {
+            "element_type": "textfield",
+            "selector_type": "ID",
+            "selector_value": "os_password",
+            "action": "USE_PASSWORD",
+            "post_action": ""
+          },
+          {
+            "element_type": "checkbox",
+            "selector_type": "ID",
+            "selector_value": "os_cookie",
+            "action": "USE_SCRIPT",
+            "post_action": ""
+          },
+          {
+            "element_type": "checkbox",
+            "selector_type": "ID",
+            "selector_value": "gdpr",
+            "action": "USE_SCRIPT",
+            "post_action": ""
+          },
+          {
+            "element_type": "button",
+            "selector_type": "XPATH",
+            "selector_value": "/html/body/div[2]/div/div[3]/div[1]/div[2]/div/div/form/fieldset/div[5]/input",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "textfield",
+            "selector_type": "ID",
+            "selector_value": "2fpin",
+            "action": "GENERATE_MFA",
+            "post_action": "submit"
+          }
+        ],
+        "edit_page": [
+          {
+            "element_type": "content",
+            "selector_type": "XPATH",
+            "selector_value": "/html/body",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "discard_button",
+            "selector_type": "XPATH",
+            "selector_value": "/html/body/div[2]/div[2]/div[6]/div[3]/form/div[9]/div/div/div[2]/div[7]/button",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "save_button",
+            "selector_type": "XPATH",
+            "selector_value": "/html/body/div[2]/div[2]/div[6]/div[3]/form/div[9]/div/div/div[2]/div[6]/button",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "full_screen",
+            "selector_type": "CSS",
+            "selector_value": "#rw_open_fullscreen .rw_icon.rw_iconfont_fullscreen",
+            "action": "click",
+            "post_action": ""
+          }
+        ]
+      },
+      "cloud": {
+        "login_page": [
+          {
+            "element_type": "textfield",
+            "selector_type": "ID",
+            "selector_value": "username",
+            "action": "USE_EMAIL",
+            "post_action": ""
+          },
+          {
+            "element_type": "button",
+            "selector_type": "ID",
+            "selector_value": "login-submit",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "textfield",
+            "selector_type": "ID",
+            "selector_value": "password",
+            "action": "USE_PASSWORD",
+            "post_action": ""
+          },
+          {
+            "element_type": "button",
+            "selector_type": "ID",
+            "selector_value": "login-submit",
+            "action": "click",
+            "post_action": ""
+          }
+        ],
+        "edit_page": [
+          {
+            "element_type": "content",
+            "selector_type": "XPATH",
+            "selector_value": "/html/body/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/main/div/div/div/div/div/div/div[1]/div[3]/div[3]/div/div[2]/div[1]/div/div/div/div[3]",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "discard_button",
+            "selector_type": "XPATH",
+            "selector_value": "/html/body/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/main/div/div/div/div/div/div/div[1]/div[2]/div[2]/div[4]/div[1]/div[2]/div/span/button",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "save_button",
+            "selector_type": "XPATH",
+            "selector_value": "//button[span[text()='Update']]",
+            "action": "click",
+            "post_action": ""
+          },
+          {
+            "element_type": "page_width_button",
+            "selector_type": "CSS",
+            "selector_value": "/html/body/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/main/div/div/div/div/div/div/div[1]/div[2]/div[2]/div[4]/div[1]/div[1]/div/span/button",
+            "action": "click",
+            "post_action": ""
+          }
+        ]
+      }
+    }
+  }
