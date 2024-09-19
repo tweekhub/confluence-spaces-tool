@@ -1,4 +1,4 @@
-from app import ConfluenceMigrationApp
+from app import ConfluenceSpacesApp
 from utils.logger import Logger
 import tkinter as tk
 from tkinter import ttk
@@ -12,7 +12,7 @@ def parse_arguments():
     parser.add_argument("--download-dir", default="downloads", type=str, help="Specify the directory to download files")
 
     parser.add_argument("--log-level", default="info", choices=["debug", "info", "warning", "error"], help="Set the logging levels")
-    parser.add_argument("--log-file", default="confluence-migration.log", help="Specify the path to the log file for the Spacesprocess")
+    parser.add_argument("--log-file", default="confluence-Spaces.log", help="Specify the path to the log file for the Spacesprocess")
     parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
     return parser.parse_args()
 
@@ -43,7 +43,7 @@ def main():
     style.configure('TNotebook.Tab', background='#d0d0d0', foreground='black', padding=[10, 5], font=('Arial', 10, 'bold'))
     style.map('TNotebook.Tab', background=[('selected', '#a0a0a0')])  # Change background when selected
 
-    ConfluenceMigrationApp(root,**kwargs)
+    ConfluenceSpacesApp(root,**kwargs)
     root.mainloop()
 
 if __name__ == "__main__":

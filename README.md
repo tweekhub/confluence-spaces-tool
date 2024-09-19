@@ -81,7 +81,7 @@ The Confluence SpacesTool can be run with various command-line arguments to cont
 - `--api-config-file`: Specify the path to the API configuration file (default: "./confluence-api.json")
 - `--browser-config-file`: Specify the path to the UI elements configuration file (default: "./confluence-elements.json")
 - `--log-level`: Set the logging level for the Spacesprocess (choices: "debug", "info", "warning", "error") (default: "info")
-- `--log-file`: Specify the path to the log file for the Spacesprocess (default: "confluence-migration.log")
+- `--log-file`: Specify the path to the log file for the Spacesprocess (default: "confluence-Spaces.log")
 - `--version`: Prints out the version for this confluence Spacestool. 
 
 ### Examples:
@@ -98,7 +98,7 @@ The Confluence SpacesTool can be run with various command-line arguments to cont
 
 ## Logging
 
-The Spacestool logs its activities to both the console and a file. By default, the log file is named `confluence-migration.log`, but this can be changed using the `--log-file` option. The logging level can be adjusted using the `--log-level` option, with available choices being "debug", "info", "warning", and "error". The default log level is "info".
+The Spacestool logs its activities to both the console and a file. By default, the log file is named `confluence-Spaces.log`, but this can be changed using the `--log-file` option. The logging level can be adjusted using the `--log-level` option, with available choices being "debug", "info", "warning", and "error". The default log level is "info".
 
 For example, to set a custom log file and increase the verbosity to debug level:
 

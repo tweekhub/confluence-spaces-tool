@@ -16,7 +16,7 @@ import threading
 import time
 logger = Logger()
 
-class ConfluenceMigrationApp:
+class ConfluenceSpacesApp:
     def __init__(self, root, **kwargs):
         self.root = root
         self.notebook = ttk.Notebook(self.root)
