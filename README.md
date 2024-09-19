@@ -1,10 +1,10 @@
 # Confluence Spaces Migration Tool 
 
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-migration-tool&metric=bugs)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-migration-tool)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-migration-tool&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-migration-tool)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-migration-tool&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-migration-tool)
-[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-migration-tool&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-migration-tool)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-migration-tool&metric=coverage)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-migration-tool)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=bugs)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=atonomic_confluence-spaces-tool&metric=coverage)](https://sonarcloud.io/summary/new_code?id=atonomic_confluence-spaces-tool)
 
 
 ## Preface
@@ -116,8 +116,8 @@ Alternatively, You can also setup a developer environment for this tool by follo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/atonomic/confluence-migration-tool.git
-   cd confluence-migration-tool
+   git clone https://github.com/atonomic/confluence-spaces-tool.git
+   cd confluence-spaces-tool
    ```
    This step downloads the tool's source code to your local machine.
 

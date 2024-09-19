@@ -7,7 +7,7 @@ ENV BROWSER_CONFIG_FILE=confluence-elements.json
 ENV DOWNLOAD_DIR=/app/downloads
 ENV LOG_LEVEL=info
 ENV LOG_FILE=confluence-app.log
-LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-migration-tool
+LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-spaces-tool
 LABEL org.opencontainers.image.description="A tool to manage your confluence pages across confluence instances"
 LABEL org.opencontainers.image.licenses=Apache
 

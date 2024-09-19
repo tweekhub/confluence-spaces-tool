@@ -17,15 +17,15 @@ For more ways to contribute, check out the [Open Source Guides](https://opensour
 
 ### Report bugs
 
-Before submitting a new issue, try to make sure someone hasn't already reported the problem. Look through the [existing issues](https://github.com/atonomic/confluence-migration-tool/issues) for similar issues.
+Before submitting a new issue, try to make sure someone hasn't already reported the problem. Look through the [existing issues](https://github.com/atonomic/confluence-spaces-tool/issues) for similar issues.
 
-Report a bug by submitting a [bug report](https://github.com/atonomic/confluence-migration-tool/issues/new?labels=type%3A+bug&template=0-bug_report.md). Make sure that you provide as much information as possible on how to reproduce the bug.
+Report a bug by submitting a [bug report](https://github.com/atonomic/confluence-spaces-tool/issues/new?labels=type%3A+bug&template=0-bug_report.md). Make sure that you provide as much information as possible on how to reproduce the bug.
 
 Follow the issue template and add additional information that will help us replicate the problem.
 
 ### Suggest enhancements
 
-If you have an idea of how to improve Confluence Migration Tool, submit a [feature request](https://github.com/atonomic/confluence-migration-tool/issues/new?assignees=&labels=type%2Ffeature-request&projects=&template=1-feature_requests.md).
+If you have an idea of how to improve Confluence Migration Tool, submit a [feature request](https://github.com/atonomic/confluence-spaces-tool/issues/new?assignees=&labels=type%2Ffeature-request&projects=&template=1-feature_requests.md).
 
 ### Write documentation
 
@@ -41,8 +41,8 @@ It's important to us to help these users, and we'd love your help. Sign up to Gi
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/atonomic/confluence-migration-tool.git
-   cd confluence-migration-tool
+   git clone https://github.com/atonomic/confluence-spaces-tool.git
+   cd confluence-spaces-tool
    ```
    This step downloads the tool's source code to your local machine.
 
