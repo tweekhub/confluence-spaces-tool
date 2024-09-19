@@ -9,6 +9,7 @@ class StatsTable:
         "space_id": "n/a",
         "current_user_email": "n/a",
         "current_user_groups": ["n/a"],
+        "total_pages_copied": "n/a",
         "total_attachments_created": "n/a",
         "total_pages_created": "n/a",
         "total_http_requests": "n/a",
@@ -53,7 +54,12 @@ class StatsTable:
                 continue
             if key == "total_attachments_created" and self.title.lower().split(" ")[0] == "source":
                 continue
-
+            if key == "total_pages_copied" and self.title.lower().split(" ")[0] == "source":
+                continue
+            if key == "root_page_title":
+                # Ensure value is a string and truncate if necessary
+                value = str(value)[:32]
+                logger.debug(f"Truncated value for 'root_page_title': {value}")
             # Convert underscored keys to display names with spaces
             display_name = key.replace('_', ' ').title()
 
@@ -86,6 +92,6 @@ class StatsTable:
                 self.labels[key].config(text=value)
 
     def update_current_user_groups(self, current_user_groups):
-            self.current_user_groups_listbox.delete(0, tk.END)
-            for group in current_user_groups:
-                self.current_user_groups_listbox.insert(tk.END, group)
+        self.current_user_groups_listbox.delete(0, tk.END)
+        for group in current_user_groups:
+            self.current_user_groups_listbox.insert(tk.END, group)

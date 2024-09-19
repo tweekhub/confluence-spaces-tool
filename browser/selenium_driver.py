@@ -16,7 +16,7 @@ from config.config_types import UIElement
 from typing import List
 
 class ConfluenceBrowserClient:
-    def __init__(self, username:str="", password:str="", mfa_secret_key:str="", timeout_after: int = 10, max_retries: int = 3,browser_headless:bool=False,is_experimental:bool=True):
+    def __init__(self, username:str="", password:str="", mfa_secret_key:str="", timeout_after: int = 15, max_retries: int = 5,browser_headless:bool=False,is_experimental:bool=True):
         self.username = username
         self.password = password
         self.mfa_secret_key = mfa_secret_key
@@ -140,7 +140,7 @@ class ConfluenceBrowserClient:
         return CachedWebElement(locator)
 
     def process_elements_chain(self, elements: List[UIElement]):
-        logger.info(f"Processing {len(elements)} Elements Chain")
+        logger.debug(f"Processing {len(elements)} Elements Chain")
         for element in elements:
             self.process_element(element, self.max_retries)
 
@@ -179,7 +179,7 @@ class ConfluenceBrowserClient:
     def select_all_and_copy(self):
         logger.debug("Selecting All and Copy Page Content")
         ActionChains(self.driver).key_down(Keys.CONTROL).send_keys('a').key_up(Keys.CONTROL).perform()
-        ActionChains(self.driver).key_down(Keys.CONTROL).send_keys('c').key_up(Keys.CONTROL).perform()
+        ActionChains(self.driver).key_down(Keys.CONTROL).send_keys('c').key_up(Keys.CONTROL).key_down(Keys.ESCAPE).key_up(Keys.ESCAPE).perform()
 
     def select_all_and_paste(self):
         logger.debug("Selecting All and Pasting Page Content")

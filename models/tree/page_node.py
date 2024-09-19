@@ -2,7 +2,6 @@ import re
 from urllib.parse import urlparse, urlunparse
 from typing import List, Optional
 from . import logger
-from . import logger
 
 class ConfluencePageNode:
     def __init__(self, page_id: str, title: str, page_type: str="", status: str="", edit_link: str="", webui_link: str="", 
@@ -73,65 +72,54 @@ class ConfluencePageNode:
         pattern = r'ac:name=\"(.*?)\"'
         return re.findall(pattern, self.body)
 
-    def replace_body(self, source_domain, target_domain, new_width=550, id_mapping=None) -> str:
+    def update_macros(self)->str:
         if self.body is None:
-            raise ValueError("Body is missing")
+            logger.error("Body is missing")
+        logger.debug("Starting to update macros in the body.")
+        # Regex pattern to handle <ac:image> tags with various attributes
+        image_macros_pattern = re.compile(
+            r'<ac:image[^>]*ac:src="([^"]+)"[^>]*?(?:ac:original-width="([^"]+)"[^>]*?)?(?:ac:original-height="([^"]+)"[^>]*?)?(?:ac:width="([^"]+)"[^>]*?)?(?:ac:height="([^"]+)"[^>]*?)?[^>]*?>'
+        )
+        # Regex pattern to handle <ac:emoticon> tags
+        emoticon_macros_pattern = re.compile(
+            r'<ac:emoticon[^>]*ac:name="([^"]+)"[^>]*?ac:emoji-shortname="([^"]+)"[^>]*?ac:emoji-id="([^"]+)"[^>]*?ac:emoji-fallback="([^"]+)"[^>]*?/>'
+        )
+        # Replace <ac:image> tags
+        updated_html = re.sub(image_macros_pattern, self._replace_image_tag, self.body)
+        # Replace <ac:emoticon> tags (if needed)
+        updated_html = re.sub(emoticon_macros_pattern, self._replace_emoticon_tag, updated_html)
+        self.set_body(updated_html)
         
-        # Ensure the source and target domains have no trailing slashes
-        source_domain = source_domain.rstrip('/')
-        target_domain = target_domain.rstrip('/')
+        logger.debug("Completed updating macros in the body.")
+        return updated_html
 
-        # Define regex pattern to match URLs with source domain and capture the path, ID (if any), and remove query params
-        url_pattern = re.escape('https://' + source_domain) + r'(/(?:download/attachments|rest/documentConversion|plugins/servlet/confluence)/([^"?]+))(?:\?[^"]*)?'
+    def _replace_image_tag(self, match):
+        ac_src = match.group(1)  # Extract the ac:src value (URL)
+        ac_original_width = match.group(2)  # Extract the ac:original-width value, if available
+        ac_original_height = match.group(3)  # Extract the ac:original-height value, if available
+        ac_width = match.group(4)  # Extract the ac:width value, if available
+        ac_height = match.group(5)  # Extract the ac:height value, if available
 
-        def replace_url(match):
-            url_path = match.group(1)
-            # Check if the ID is in the second capture group (only for download/attachments)
-            old_id = match.group(2).split('/')[0] if 'download/attachments' in url_path else None
+        # Use available width and height values
+        width = ac_original_width if ac_original_width else ac_width
+        height = ac_original_height if ac_original_height else ac_height
 
-            # Replace the ID if a mapping is provided, only for /download/attachments paths
-            if old_id and id_mapping and old_id in id_mapping:
-                new_id = id_mapping[old_id]
-                url_path = url_path.replace(old_id, new_id)
+        # Extract the filename from the URL (everything after the last '/')
+        filename = ac_src.split('/')[-1].split('?')[0]
+        # Replacement string with the extracted filename, width, and height
+        replacement = f'<ac:image ac:width="{width}" ac:height="{height}">\n<ri:attachment ri:filename="{filename}" />\n</ac:image>'
+        logger.debug(f"Replaced image tag with filename: {filename}, width: {width}, height: {height}")
 
-            # Construct the new URL, replacing the domain and ID, and removing query parameters
-            return f'https://{target_domain}{url_path}'
+        return replacement
 
-        # Replace all URLs with target domain, updated ID (if provided), and remove query params
-        modified_html = re.sub(url_pattern, replace_url, str(self.body))
+    def _replace_emoticon_tag(self, match):
+        ac_name = match.group(1)
+        ac_shortname = match.group(2)
+        ac_emoji_id = match.group(3)
+        ac_fallback = match.group(4)
 
-        # Replace all image widths with new width (550 in this case)
-        width_pattern = r'ac:width="\d+"'
-        width_replacement = f'ac:width="{new_width}"'
-        modified_html = re.sub(width_pattern, width_replacement, modified_html)
+        # If needed, you can handle emoticons differently or just leave them unchanged
+        replacement = f'<ac:emoticon ac:name="{ac_name}" ac:emoji-shortname="{ac_shortname}" ac:emoji-id="{ac_emoji_id}" ac:emoji-fallback="{ac_fallback}" />'
+        logger.debug(f"Replaced emoticon tag with name: {ac_name}, shortname: {ac_shortname}, id: {ac_emoji_id}, fallback: {ac_fallback}")
 
-        return modified_html
-
-    def replace_body(self, source_url: str, target_url: str) -> str:
-        if self.body is None:
-            raise ValueError("Body is missing")
-        
-        # Extract domain from source_url
-        domain_pattern = r'https://([a-zA-Z0-9.-]+)'
-        match = re.match(domain_pattern, source_url)
-        if not match:
-            raise ValueError("Invalid source_url format")
-        
-        domain = match.group(1)
-        
-        # Define the regex pattern to match the URL and capture parts
-        pattern = rf'https://{re.escape(domain)}/download/attachments/(\d+)/([^"?]+)(?:\?[^"]*)?'
-        
-        # Define the replacement pattern, replacing domain and URL with target_url
-        replacement = fr'https://{re.escape(target_url)}/wiki/download/attachments/{self.id}/\2'
-        
-        # Use re.sub to replace all occurrences of the URL pattern with the new format
-        modified_html = str(self.body).replace(pattern,replacement)
-
-        # Replace width attribute
-        width_pattern = r'ac:width="250"'
-        width_replacement = r'ac:width="450"'
-        
-        modified_size = modified_html.replace(width_pattern, width_replacement)
-        
-        return modified_size
+        return replacement

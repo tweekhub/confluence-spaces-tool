@@ -110,22 +110,22 @@
         "edit_page": [
           {
             "element_type": "content",
-            "selector_type": "XPATH",
-            "selector_value": "/html/body/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/main/div/div/div/div/div/div/div[1]/div[3]/div[3]/div/div[2]/div[1]/div/div/div/div[3]",
+            "selector_type": "ID",
+            "selector_value": "ak-editor-textarea",
             "action": "click",
             "post_action": ""
           },
           {
             "element_type": "discard_button",
-            "selector_type": "XPATH",
-            "selector_value": "/html/body/div[1]/div[2]/div[1]/div[2]/div[2]/div[2]/main/div/div/div/div/div/div/div[1]/div[2]/div[2]/div[4]/div[1]/div[2]/div/span/button",
+            "selector_type": "ID",
+            "selector_value": "close-button",
             "action": "click",
             "post_action": ""
           },
           {
             "element_type": "save_button",
-            "selector_type": "XPATH",
-            "selector_value": "//button[span[text()='Update']]",
+            "selector_type": "CSS",
+            "selector_value": "[data-testid=\"publish-modal-update-button\"]",
             "action": "click",
             "post_action": ""
           },

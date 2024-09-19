@@ -85,15 +85,6 @@ class ConfluenceInstance:
             'credentials': self.credentials.to_dict(),  # Convert credentials to dict
         }
 
-    def validate_confluence_type(self, input_str: str) -> str:
-        processed_str = re.sub(r'\W+', '', input_str).lower()
-        if processed_str in ["confluenceserver", "server"]:
-            return "server"
-        elif processed_str in ["confluencecloud", "cloud"]:
-            return "cloud"
-        else:
-            raise ValueError(f"Invalid Confluence type: {input_str}")
-
     def from_dict(self, data: Dict[str, Any]) -> None:
         """Update instance only if the new value differs from the current one."""
         if data.get('name') != self.name:
@@ -118,3 +109,12 @@ class ConfluenceInstance:
             self.fetch_attachments_limit = data['fetch_attachments_limit']
         if 'credentials' in data:
             self.credentials.from_dict(data['credentials'])
+
+    def validate_confluence_type(self, input_str: str) -> str:
+        processed_str = re.sub(r'\W+', '', input_str).lower()
+        if processed_str in ["confluenceserver", "server"]:
+            return "server"
+        elif processed_str in ["confluencecloud", "cloud"]:
+            return "cloud"
+        else:
+            raise ValueError(f"Invalid Confluence type: {input_str}")

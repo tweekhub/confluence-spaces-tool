@@ -3,12 +3,13 @@ import yaml
 from pathlib import Path
 import re
 from config.config_types import UIElement, ConfluenceInstance
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import json
 
 class ConfluenceConfig:
     def __init__(self, config_file: str,api_config_file:str,browser_config_file:str):
-        self.config_data = self._load_config(config_file)
+        self.config_file = config_file
+        self.config_data = self._load_config(self.config_file)
         self.browser_config_data = self._load_elements_config(browser_config_file)
         self.api_config_data = self._load_api_config(api_config_file)
         # Load source and target instances
@@ -117,3 +118,23 @@ class ConfluenceConfig:
     def get_endpoint(self, instance_type: str, category: str, action: str, api_version: str = "v1") -> str:
         return self.api_config_data.get(instance_type, {}).get(api_version, {}).get(category, {}).get(action, '')
 
+    def update_config(self, updated_config: Dict[str, Any]) -> None:
+        if not isinstance(updated_config, dict):
+            raise ValueError("updated_config must be a dictionary")
+
+        self.config_data = self._merge_dicts(self.config_data, updated_config)
+        
+        with open(self.config_file, 'w') as file:
+            try:
+                yaml.dump(self.config_data, file, default_flow_style=False, sort_keys=False)
+                logger.debug(f"Configuration successfully updated and written to {self.config_file}")
+            except yaml.YAMLError as e:
+                raise yaml.YAMLError(f"Error writing updated configuration to YAML file: {e}")
+
+    def _merge_dicts(self, original: dict, updates: dict) -> dict:
+        for key, value in updates.items():
+            if isinstance(value, dict) and key in original:
+                original[key] = self._merge_dicts(original[key], value)
+            else:
+                original[key] = value
+        return original

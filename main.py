@@ -26,7 +26,7 @@ def main():
 
     root = tk.Tk()
     root.title("Confluence SpacesTool")
-    window_width = 1320
+    window_width = 1260
     window_height = 915
     # Set the initial window size
     root.geometry(f"{window_width}x{window_height}")

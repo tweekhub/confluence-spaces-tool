@@ -6,7 +6,7 @@ from tkinter.scrolledtext import ScrolledText
 class ActionsSection:
     DEFAULT_ACTIONS = {
         "fetch_pages": {
-            "text": "Read",
+            "text": "Fetch",
             "options": {
                 "source": {"text": "Source Pages", "command": lambda: logger.info("Fetching Source Pages...")},
                 "target": {"text": "Target Pages", "command": lambda: logger.info("Fetching Target Pages...")},
@@ -84,9 +84,21 @@ class ActionsSection:
 
         # Combobox with the list of option texts
         option_texts = [option_data["text"] for option_data in action["options"].values()]
-        combo = ttk.Combobox(parent, values=option_texts, state="readonly",width="17")
+        combo = ttk.Combobox(parent, values=option_texts, state="readonly",width=17)
         combo.grid(row=row, column=col + 1, padx=5, pady=5, sticky="nsew")
-
+        # Bind a tooltip to display the full text on hover
+        def show_tooltip(event):
+            item = combo.get()
+            if item:
+                tooltip_label.config(text=item)
+                tooltip_label.place(x=event.x_root, y=event.y_root)
+        
+        def hide_tooltip(event):
+            tooltip_label.place_forget()
+        
+        tooltip_label = tk.Label(parent, text="", background="yellow", relief="solid", borderwidth=1, padx=5, pady=2)
+        combo.bind("<<Enter>>", show_tooltip)
+        combo.bind("<<Leave>>", hide_tooltip)
         # Execute button
         button = tk.Button(parent, text="Execute", command=lambda c=combo, k=action_key: self.execute_selected_option(c, k))
         button.grid(row=row, column=col + 2, padx=5, pady=5, sticky="nsew")

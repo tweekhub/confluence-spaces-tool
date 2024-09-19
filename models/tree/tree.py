@@ -12,7 +12,8 @@ class ConfluencePagesTree:
         self.api_client = api_client
         self.tree_file = f"tree_{self.api_client.instance_config.name}_{self.api_client.instance_config.root_page_id}.txt"
         self.tree_file_json = f"tree_{self.api_client.instance_config.name}_{self.api_client.instance_config.root_page_id}.json"
-        logger.debug(f"Initialized ConfluencePagesTree with root: {root.title}")
+        self.logs_prefix = f"{self.api_client.instance_config.name} {self.api_client.instance_config.confluence_type}> "
+        self.total_nodes = 0 
 
     def print_pages(self, node: Optional[ConfluencePageNode] = None, level: int = 0):
         current_node = node or self.root
@@ -66,7 +67,7 @@ class ConfluencePagesTree:
                         new_target_children.append(target_children[title])
                         self.rearrange_trees(target_children[title], original_child)
                     else:
-                        logger.warning(f"Warning: No matching node found in target tree for '{title}'")
+                        logger.warning(f"{self.logs_prefix} Warning: No matching node found in target tree for '{title}'")
             target_node.children = [child for child in target_node.children if not isinstance(child, ConfluencePageNode)] + new_target_children
         except Exception as e:
             logger.error(f"Error in rearrange_trees: {str(e)}")
@@ -74,18 +75,16 @@ class ConfluencePagesTree:
 
     def fetch_pages(self, node: Optional[ConfluencePageNode] = None, confluence_type: str = '', from_label: str = "", exclude_page_ids: list = []):
         current_node = node or self.root
-        logger.debug(f"Fetching pages for node: {current_node.title}, excluding pages with IDs: {exclude_page_ids[0]}")
+        logger.debug(f"{self.logs_prefix} Fetching pages for node: {current_node.title}, excluding pages with IDs: {exclude_page_ids[0]}")
 
         child_pages = self.api_client.get_child_pages(current_node.id)
         current_node.child_pages = child_pages
         for page_data in child_pages:
             page = ConfluencePageNode.from_api_response(page_data, confluence_type)
-            response = self.api_client.get_content(page.id)
-            page.set_body(response.json()['body']['storage']['value'])
 
             # Skip the page if it's in the exclude_page_ids list
             if str(page.id) in exclude_page_ids:
-                logger.warning(f"Skipping page {page.title} (ID: {page.id}) and its children due to exclude_page_id match")
+                logger.warning(f"{self.logs_prefix} Skipping page {page.title} (ID: {page.id}) and its children due to exclude_page_id match")
                 continue  # Skip this page and its children but continue processing siblings
 
             # Fetch and assign labels
@@ -94,15 +93,15 @@ class ConfluencePagesTree:
             # Apply label-based filtering if 'from_label' is provided
             if from_label:
                 if not page.labels:
-                    logger.warning(f"Skipping page {page.title} (ID: {page.id}) as it has no labels")
+                    logger.warning(f"{self.logs_prefix} Skipping page {page.title} (ID: {page.id}) as it has no labels")
                     continue
 
                 if from_label not in page.labels:
-                    logger.warning(f"Skipping page {page.title} (ID: {page.id}) due to missing label: {from_label}")
+                    logger.warning(f"{self.logs_prefix} Skipping page {page.title} (ID: {page.id}) due to missing label: {from_label}")
                     continue
 
             # Log page details and add it to the current node
-            logger.debug(f"Adding page {page.title} (ID: {page.id}) with labels: {page.labels}")
+            logger.debug(f"{self.logs_prefix} Adding page {page.title} (ID: {page.id}) with labels: {page.labels}")
             current_node.add_child(page)
 
             # Recursively fetch child pages of this page (only if it's not excluded)
@@ -115,8 +114,18 @@ class ConfluencePagesTree:
         for attachment_data in response.json()['children']['attachment']['results']:
             attachment = ConfluenceAttachmentNode.from_api_response(attachment_data)
             current_node.add_child_attachment(attachment)
-            logger.debug(f"Added attachment: {attachment.title}")
+            logger.debug(f"{self.logs_prefix} Added attachment: {attachment.title}")
 
     def build_tree(self, confluence_type: str, from_label: str = "", exclude_page_ids: list = []):
-        logger.info("Building the Confluence pages tree...")
+        logger.info(f"{self.logs_prefix} Building the Confluence pages tree...")
         self.fetch_pages(confluence_type=confluence_type, from_label=from_label, exclude_page_ids=exclude_page_ids)
+        self.total_nodes = self.count_children()
+        logger.info(f"{self.logs_prefix} ConfluencePagesTree with root {self.root.title} with total of {self.total_nodes} nodes is ready...")
+
+    def count_children(self, node: Optional[ConfluencePageNode] = None) -> int:
+        current_node = node or self.root
+        count = len(current_node.children)  # Start with the number of direct children
+        for child in current_node.children:
+            if isinstance(child, ConfluencePageNode):
+                count += self.count_children(child)  # Add the count of each child's children
+        return count

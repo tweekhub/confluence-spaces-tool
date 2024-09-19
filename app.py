@@ -63,10 +63,13 @@ class ConfluenceSpacesApp:
         self.actions_section.update_action_command("download","word",{"command": lambda: threading.Thread(target=self.download_words).start()})
         self.actions_section.update_action_command("download","attachments",{"command": lambda: threading.Thread(target=self.download_attachments).start()})
 
+        self.total_pages_copied = 0
+
     def update_source_instance(self):
         updated_data = self.source_form.get_selected_values()
         self.source_instance.from_dict(updated_data)
-        logger.info(f"Authenticating {self.source_instance.name} using {self.source_instance.credentials.rest_auth_type}")
+        self.app_config.update_config({"source": self.source_instance.to_dict()})
+        logger.info(f"{self.source_instance.name} {self.source_instance.confluence_type}> Using {self.source_instance.credentials.rest_auth_type.title()}")
         if self.source_instance.credentials.rest_auth_type != "cookies_auth":
             self.source_api_client.initialize_session()
         else:
@@ -86,7 +89,8 @@ class ConfluenceSpacesApp:
     def update_target_instance(self):
         updated_data = self.target_form.get_selected_values()
         self.target_instance.from_dict(updated_data)
-        logger.info(f"Authenticating {self.target_instance.name} using {self.target_instance.credentials.rest_auth_type}")
+        self.app_config.update_config({"target": self.target_instance.to_dict()})
+        logger.info(f"{self.target_instance.name} {self.target_instance.confluence_type}> Using {self.target_instance.credentials.rest_auth_type.title()}")
         if self.target_instance.credentials.rest_auth_type != "cookies_auth":
             self.target_api_client.initialize_session()
         else:
@@ -127,35 +131,38 @@ class ConfluenceSpacesApp:
         if self.source_tree:
             self.source_tree.print_pages_to_file()
             self.source_tree.save_tree_to_file_as_json()
-        self._update_req_stats()
         
     def save_target_trees(self):
         if self.target_tree:
             self.target_tree.print_pages_to_file()
             self.target_tree.save_tree_to_file_as_json()
-        self._update_req_stats()
 
-    def create_pages(self, with_attachments: bool = False):
-        # Start the real-time stats update in a separate thread
+    def execute_with_stats_update(self, func, *args, **kwargs):
         stop_event = threading.Event()  # Event to signal when to stop the stats thread
         stats_thread = threading.Thread(target=self._update_stats_realtime, args=(stop_event,))
         stats_thread.start()
-        try: # Create pages in order, which can take time
-            self.target_tree = None
-            root_page = self.target_api_client.get_content(self.target_instance.root_page_id)
-            root_node = ConfluencePageNode.from_api_response(root_page.json(), self.target_instance.confluence_type)
-            self.target_tree = ConfluencePagesTree(root_node, self.target_api_client)
-            self.create_pages_in_order(self.source_tree.root, self.target_instance.root_page_id, with_attachments)
+        
+        try:
+            # Call the function with provided arguments
+            result = func(*args, **kwargs)
         finally:
-            # Stop the real-time stats update once page creation is done
+            # Stop the real-time stats update once the function execution is done
             stop_event.set()  # Signal the stats thread to stop
             stats_thread.join()  # Wait for the stats thread to finish
-        # Final update of the stats after the creation process
+        
+        # Final update of the stats after the execution
         self.target_stats.update_stats({
             "total_pages_created": self.target_api_client.total_pages_created,
             "total_attachments_created": self.target_api_client.total_attachments_created
         })
         self._update_req_stats()  # Final stats update
+        return result
+
+    def create_pages(self, with_attachments: bool = False):
+        root_page = self.target_api_client.get_content(self.target_instance.root_page_id)
+        root_node = ConfluencePageNode.from_api_response(root_page.json(), self.target_instance.confluence_type)
+        self.target_tree = ConfluencePagesTree(root_node, self.target_api_client)
+        return self.execute_with_stats_update(self.create_pages_in_order, self.source_tree.root, self.target_instance.root_page_id, with_attachments)
 
     def _create_page(self,parent_id,source_node: ConfluencePageNode,with_attachments: bool = False):
         self._update_req_stats()
@@ -202,93 +209,119 @@ class ConfluenceSpacesApp:
             logger.warning(f"No attachments Found for '{source_node.title}'")
         self._update_req_stats()
 
-    def copy_pages(self,edit_mode:bool=False):
-        if self.target_tree == None:
+    def copy_pages(self, edit_mode: bool = False, **kwargs):
+        if self.target_tree is None:
             logger.warn_tree_not_initialized(is_source=False)
-            return 
+            return
 
-        browser = ConfluenceBrowserClient()
-        browser.initialize_driver()
-        browser.open_page_in_same_tab(self.source_instance.site_url + self.source_instance.home_path)
-        browser.set_credentials(self.source_instance.credentials.email, self.source_instance.credentials.password, self.source_instance.credentials.mfa_secret_key)
-        browser.process_elements_chain(self.app_config.get_elements_list(self.source_instance.confluence_type,'login_page'))
-        browser.open_new_tab(self.target_instance.site_url + self.target_instance.home_path)
-        browser.set_credentials(self.target_instance.credentials.email, self.target_instance.credentials.password, self.target_instance.credentials.mfa_secret_key)
-        browser.process_elements_chain(self.app_config.get_elements_list(self.target_instance.confluence_type,'login_page'))
-        self.target_tree.rearrange_trees(self.source_tree.root)
-        for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
-            # No more edit view is being used to copy content so useles
-            if edit_mode:
-                if not self.source_api_client.get_page_restrictions(source_node.id):
-                    logger.warning(f"Page '{source_node.title}' is not editable, skipping.")
-                    continue
-            if source_node.title == new_node.title:
-                logger.debug(f"Title matches: {source_node.title}")
-                source_url = ""
+        def copy_logic():
+            browser = ConfluenceBrowserClient()
+            browser.initialize_driver()
+            browser.open_page_in_same_tab(self.source_instance.site_url + self.source_instance.home_path)
+            browser.set_credentials(self.source_instance.credentials.email, self.source_instance.credentials.password, self.source_instance.credentials.mfa_secret_key)
+            browser.process_elements_chain(self.app_config.get_elements_list(self.source_instance.confluence_type, 'login_page'))
+
+            browser.open_new_tab(self.target_instance.site_url + self.target_instance.home_path)
+            browser.set_credentials(self.target_instance.credentials.email, self.target_instance.credentials.password, self.target_instance.credentials.mfa_secret_key)
+            browser.process_elements_chain(self.app_config.get_elements_list(self.target_instance.confluence_type, 'login_page'))
+
+            self.target_tree.rearrange_trees(self.source_tree.root)
+            for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
                 if edit_mode:
-                    source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id)
-                else: 
-                    source_url = f"{self.source_instance.site_url}{self.app_config.get_endpoint(self.source_instance.confluence_type,'source','view')}?pageId={source_node.id}"
-                browser.perform_copy_paste(
-                source={'tab_index': 0,'url': source_url,
-                    'element_selector_value': self.app_config.get_element(self.source_instance.confluence_type,'edit_page','content').selector_value,
-                    'element_selector_type': self.app_config.get_element(self.source_instance.confluence_type,'edit_page','content').selector_type,
-                    'discard_selector_value': self.app_config.get_element(self.source_instance.confluence_type,'edit_page','discard_button').selector_value,
-                    'discard_selector_type': self.app_config.get_element(self.source_instance.confluence_type,'edit_page','discard_button').selector_type,
-                    },
-                target={'tab_index': 1,'url': self._get_edit_url(self.target_instance.confluence_type, self.target_instance.site_url, new_node.edit_link, self.target_instance.space_key, new_node.id),
-                    'element_selector_value': self.app_config.get_element(self.target_instance.confluence_type,'edit_page','content').selector_value,
-                    'element_selector_type': self.app_config.get_element(self.target_instance.confluence_type,'edit_page','content').selector_type,   
-                    'save_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type,'edit_page','save_button').selector_value,
-                    'save_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type,'edit_page','save_button').selector_type,
-                    'page_width_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type,'edit_page','page_width_button').selector_value,
-                    'page_width_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type,'edit_page','page_width_button').selector_type,
-                },
-                edit_mode=edit_mode
-            )
-            else:
-                logger.warning(f"Warning: Titles do not match. Original: '{source_node.title}', Target: '{new_node.title}'")
-        browser.close_driver()
+                    if not self.source_api_client.get_page_restrictions(source_node.id):
+                        logger.warning(f"Page '{source_node.title}' is not editable, skipping.")
+                        continue
+
+                if source_node.title == new_node.title:
+                    logger.debug(f"Title matches: {source_node.title}")
+                    source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id) if edit_mode else \
+                        f"{self.source_instance.site_url}{self.app_config.get_endpoint(self.source_instance.confluence_type, 'source', 'view')}?pageId={source_node.id}"
+
+                    browser.perform_copy_paste(
+                        source={
+                            'tab_index': 0,
+                            'url': source_url,
+                            'element_selector_value': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'content').selector_value,
+                            'element_selector_type': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'content').selector_type,
+                            'discard_selector_value': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'discard_button').selector_value,
+                            'discard_selector_type': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'discard_button').selector_type,
+                        },
+                        target={
+                            'tab_index': 1,
+                            'url': self._get_edit_url(self.target_instance.confluence_type, self.target_instance.site_url, new_node.edit_link, self.target_instance.space_key, new_node.id),
+                            'element_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'content').selector_value,
+                            'element_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'content').selector_type,
+                            'save_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'save_button').selector_value,
+                            'save_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'save_button').selector_type,
+                            'page_width_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'page_width_button').selector_value,
+                            'page_width_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'page_width_button').selector_type,
+                        },
+                        edit_mode=edit_mode
+                    )
+                    # Start a thread to wait for body update
+                    # update_thread = threading.Thread(target=self.wait_for_body_update, args=(new_node,))
+                    # update_thread.start()
+                    self.total_pages_copied += 1
+                else:
+                    logger.warning(f"Warning: Titles do not match. Original: '{source_node.title}', Target: '{new_node.title}'")
+            browser.close_driver()
+
+        return self.execute_with_stats_update(copy_logic, **kwargs)
+
+    def wait_for_body_update(self, new_node:ConfluencePageNode):
+        logger.debug(f"Waiting for body update for page ID: {new_node.id}")
+        response = self.target_api_client.get_content(new_node.id)
+        new_node.set_body(response.json()['body']['storage']['value'])
+        updated_page = new_node.update_macros()
+        self.target_api_client.update_content(content_id=new_node.id,content_title=new_node.title,body_data=updated_page,confluence_type=self.target_instance.confluence_type)
 
     def copy_attachments(self):
-        if self.target_tree == None:
-            logger.warn_tree_not_initialized(is_source=False)
-            return 
-        logger.info("Copying Attachments to target pages...")
-        self.target_tree.rearrange_trees(self.source_tree.root)
-        for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
-            if source_node.title == new_node.title:
-                logger.debug(f"Title matches: {source_node.title}")
-                self.download_and_upload_attachments(source_node, new_node.id)
-        self._update_req_stats()
+        def copy_logic():
+            if self.target_tree == None:
+                logger.warn_tree_not_initialized(is_source=False)
+                return 
+            logger.info("Copying Attachments to target pages...")
+            self.target_tree.rearrange_trees(self.source_tree.root)
+            for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
+                if source_node.title == new_node.title:
+                    logger.debug(f"Title matches: {source_node.title}")
+                    self.download_and_upload_attachments(source_node, new_node.id)
+            self._update_req_stats()
+        return self.execute_with_stats_update(copy_logic, **kwargs)
 
     def download_pdfs(self):
-        if self.source_tree == None:
-            logger.warn_tree_not_initialized(is_source=True)
-            return 
-        for page in self.source_tree.traverse_tree():
-            self.source_api_client.download_pdf(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
-            self._update_req_stats()
+        def download():
+            if self.source_tree == None:
+                logger.warn_tree_not_initialized(is_source=True)
+                return 
+            for page in self.source_tree.traverse_tree():
+                self.source_api_client.download_pdf(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
+                self._update_req_stats()
+        return self.execute_with_stats_update(download, **kwargs)
 
     def download_words(self):
-        if self.source_tree == None:
-            logger.warn_tree_not_initialized(is_source=True)
-            return 
-        for page in self.source_tree.traverse_tree():
-            self.source_api_client.download_word(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
-            self._update_req_stats()
+        def download():
+            if self.source_tree == None:
+                logger.warn_tree_not_initialized(is_source=True)
+                return 
+            for page in self.source_tree.traverse_tree():
+                self.source_api_client.download_word(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
+                self._update_req_stats()
+        return self.execute_with_stats_update(download, **kwargs)
 
     def download_attachments(self):
-        if self.source_tree == None:
-            logger.warn_tree_not_initialized(is_source=True)
-            return 
-        for page in self.source_tree.traverse_tree():
-            self.source_tree.fetch_attachments(page)
-            if len(page.child_attachments) > 0:
-                for attachment in page.child_attachments:
-                    file_path = self.source_api_client.download_attachment(page.id, attachment.title,f"{self.download_dir}/attachments/{self.source_api_client.safe_name(page.title)}")
-                    logger.debug(f"Downloaded attachment to {file_path}")
-                    self._update_req_stats()
+        def download():
+            if self.source_tree == None:
+                logger.warn_tree_not_initialized(is_source=True)
+                return 
+            for page in self.source_tree.traverse_tree():
+                self.source_tree.fetch_attachments(page)
+                if len(page.child_attachments) > 0:
+                    for attachment in page.child_attachments:
+                        file_path = self.source_api_client.download_attachment(page.id, attachment.title,f"{self.download_dir}/attachments/{self.source_api_client.safe_name(page.title)}")
+                        logger.debug(f"Downloaded attachment to {file_path}")
+                        self._update_req_stats()
+        return self.execute_with_stats_update(download, **kwargs)
 
     def _update_stats_realtime(self, stop_event):
         #Continuously updates the stats until the stop_event is set. param stop_event: Event to signal when to stop updating stats.
@@ -296,11 +329,12 @@ class ConfluenceSpacesApp:
             # Update the stats at regular intervals (e.g., every 2 seconds)
             self.target_stats.update_stats({
                 "total_pages_created": self.target_api_client.total_pages_created,
-                "total_attachments_created": self.target_api_client.total_attachments_created
+                "total_attachments_created": self.target_api_client.total_attachments_created,
+                "total_pages_copied": self.total_pages_copied,
             })
             self._update_req_stats()
             # Wait for a short interval before updating again
-            time.sleep(2)  # Adjust the sleep time as needed for real-time updates
+            time.sleep(1)  # Adjust the sleep time as needed for real-time updates
             
     def _get_edit_url(self,confluence_type, site_url:str="", edit_url:str="", space_key:str="", page_id:str=""):
         if confluence_type == 'cloud':
