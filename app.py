@@ -253,7 +253,7 @@ class ConfluenceMigrationApp:
         if self.target_tree == None:
             logger.warn_tree_not_initialized(is_source=False)
             return 
-        logger.info(f"Copying Attachments to target pages...")
+        logger.info("Copying Attachments to target pages...")
         self.target_tree.rearrange_trees(self.source_tree.root)
         for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
             if source_node.title == new_node.title:

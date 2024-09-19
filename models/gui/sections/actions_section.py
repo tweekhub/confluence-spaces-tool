@@ -89,13 +89,13 @@ class ActionsSection:
         combo.grid(row=row, column=col + 1, padx=5, pady=5, sticky=sticky)
 
         # Execute button
-        button = tk.Button(parent, text="Execute", command=lambda c=combo, k=action_key: self.execute_selected_option(c, k, options))
+        button = tk.Button(parent, text="Execute", command=lambda c=combo, k=action_key: self.execute_selected_option(c, k))
         button.grid(row=row, column=col + 2, padx=5, pady=5, sticky=sticky)
 
         # Save the button and combobox reference
         self.buttons[action_key] = (combo, button)
 
-    def execute_selected_option(self, combo, action_key, option_keys):
+    def execute_selected_option(self, combo, action_key):
         selected_text = combo.get()
         if selected_text and action_key in self.config:
             action_options = self.config[action_key]["options"]
