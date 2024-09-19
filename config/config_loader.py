@@ -50,26 +50,21 @@ class ConfluenceConfig:
             raise json.JSONDecodeError(f"Error decoding {config_file}")
 
     def _load_confluence_instance(self, instance_data: dict) -> ConfluenceInstance:
-        """Helper method to load Confluence instance data from the config."""
         if not instance_data:
             raise ValueError("Missing Confluence instance data in the configuration.")
         logger.debug(f"Loading Confluence instance: {instance_data['name']}")
         return ConfluenceInstance(config_data=instance_data)
 
     def find_instance_by_key(self, key: str) -> ConfluenceInstance:
-        """Finds an instance (source/target) by key."""
         valid_keys = ['source', 'target']
         if key not in valid_keys:
             raise ValueError(f"Invalid key '{key}'. Valid keys are: {valid_keys}")
         instance_data = self.config_data.get(key)
         if not instance_data:
             raise ValueError(f"No instance data found for key '{key}' in the configuration.")
-
-        # logger.debug(f"Found instance for key '{key}': {instance_data['name']}")
         return ConfluenceInstance(config_data=instance_data)
 
     def get_auth_credentials(self, instance_key: str) -> dict:
-        """Returns the authentication credentials based on the instance's authentication type."""
         instance = self.find_instance_by_key(instance_key)
         credentials = instance.credentials
 
@@ -94,7 +89,6 @@ class ConfluenceConfig:
             raise ValueError(f"Unsupported authentication method: {credentials.rest_auth_type}")
 
     def get_elements_list(self, instance_type: str, page_type: str) -> List[UIElement]:
-        """Returns a list of UI elements for a specific instance and page type."""
         try:
             elements_data = self.browser_config_data['confluence'][instance_type][page_type]
         except KeyError:
@@ -110,18 +104,16 @@ class ConfluenceConfig:
         return ui_elements
 
     def get_element(self, instance_type: str, page_type: str, element_type: str) -> UIElement:
-        """Fetch a specific UI element by type."""
         try:
             elements_data = self.browser_config_data['confluence'][instance_type][page_type]
         except KeyError:
             logger.warning(f"No elements found for page type '{page_type}' in instance '{instance_type}'")
-            return None
+            return UIElement({"element_type": "default", "name": "default_element"})
         for element_data in elements_data:
             if element_data['element_type'] == element_type:
                 return UIElement(element_data)
         return UIElement({"element_type": "default", "name": "default_element"})
 
     def get_endpoint(self, instance_type: str, category: str, action: str, api_version: str = "v1") -> str:
-        """Returns the API endpoint based on instance type, category, and action."""
         return self.api_config_data.get(instance_type, {}).get(api_version, {}).get(category, {}).get(action, '')
 

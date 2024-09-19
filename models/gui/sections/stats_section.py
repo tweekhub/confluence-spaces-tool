@@ -26,9 +26,6 @@ class StatsTable:
         self.sticky = sticky
         self.config = config or self.DEFAULTS
         self.create_section()
-        # if self.title.lower().startswith("source"):
-        #     self.config.pop('total_attachments_created', None)
-        #     self.config.pop('total_attachments_created', None)
 
     def create_section(self):
         self.frame = ttk.LabelFrame(self.parent, text=self.title, padding=5)

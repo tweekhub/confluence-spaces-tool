@@ -148,7 +148,6 @@ class SettingsForm:
 
     def validate_fields(self):
         valid = True
-        # Clear all error labels before validating
         self.clear_error_labels()
 
         # Validate Name
@@ -308,10 +307,22 @@ class SettingsForm:
             }
         }
 
+    def masked_config(self):
+        config = self.get_selected_values()
+        masked_config = {
+            **config,
+            'credentials': {
+                **config['credentials'],
+                'password': '*' * len(config['credentials']['password']) if config['credentials']['password'] else None,
+                'mfa_secret_key': '*' * len(config['credentials']['mfa_secret_key']) if config['credentials']['mfa_secret_key'] else None
+            }
+        }
+        return masked_config
+
     def save_config(self):
         if self.validate_fields():
-            self.get_selected_values()
-            # logger.debug(f"{config.get('name','')} Config Saved: {config}")
+            config = self.masked_config()
+            logger.debug(f"{config.get('name','')} Config Saved: {config}")
             self.set_edit_mode(False)
             self.update_config()
         else:

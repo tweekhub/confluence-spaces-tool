@@ -73,9 +73,6 @@ class ActionsSection:
 
 
     def create_combobox_with_button(self, parent, action_key, row, col,sticky):
-        """
-        Create a label, combobox, and button using options from the config.
-        """
         action = self.config.get(action_key)
         if not action:
             print(f"Action '{action_key}' not found in config.")
@@ -99,9 +96,6 @@ class ActionsSection:
         self.buttons[action_key] = (combo, button)
 
     def execute_selected_option(self, combo, action_key, option_keys):
-        """
-        Execute the command based on the selected option in the combobox, using the key.
-        """
         selected_text = combo.get()
         if selected_text and action_key in self.config:
             action_options = self.config[action_key]["options"]
@@ -122,12 +116,6 @@ class ActionsSection:
             print(f"No valid option selected for {action_key}.")
 
     def update_action_command(self, action_name, option_key, new_command):
-        """
-        Update the command of a specific option within an action based on the option key.
-        :param action_name: The action containing the option.
-        :param option_key: The key of the option to update.
-        :param new_command: A dictionary containing the new 'text' and 'command' for the option.
-        """
         if action_name in self.config:
             action = self.config[action_name]
             if "options" in action:
@@ -144,16 +132,11 @@ class ActionsSection:
             logger.warning(f"Action '{action_name}' not found in config.")
 
     def update_button_state(self, action_name, new_state_combobox:str="readonly",new_state_button:str="disabled"):
-        """Update the state of a button or a combobox/button pair."""
         if action_name in self.buttons:
             widget = self.buttons[action_name]
             if isinstance(widget, tuple):
-                # It's a combobox and button pair
                 combobox, button = widget
                 combobox.config(state=new_state_combobox)  # Update combobox state
                 button.config(state=new_state_button)  # Update button state
-                # logger.info(f"Updated state of {action_name} combobox: {new_state_combobox} button: {new_state_button}")
             else:
-                # It's a standalone button
                 widget.config(state=new_state_button)
-                # logger.info(f"Updated state of {action_name} button: {new_state_button}")

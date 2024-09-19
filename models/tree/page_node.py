@@ -61,16 +61,6 @@ class ConfluencePageNode:
             edit_link=response['_links']['editui'] if confluence_type == 'cloud' else response['_links']['edit'],
             webui_link=response['_links']['webui']
         )
-
-        # if 'metadata' in response and 'labels' in response['metadata']:
-        #     page.labels = [label['name'] for label in response['metadata']['labels'].get('results', [])]
-        
-        # if 'children' in response:
-        #     if 'page' in response['children']:
-        #         page.child_pages = [cls.from_api_response(child, confluence_type) for child in response['children']['page'].get('results', [])]
-        #     if 'attachment' in response['children']:
-        #         page.child_attachments = response['children']['attachment'].get('results', [])
-        
         return page
     
     @classmethod

@@ -30,16 +30,10 @@ COPY . /app
 WORKDIR /app
 
 # Make the install_browser.sh script executable
-RUN chmod +x /app/scripts/install_browser.sh
-
-# Use sed to remove 'sudo' commands from the script
-RUN sed -i 's/sudo //g' /app/scripts/install_browser.sh
-
-# Run the script to install the browser
-RUN /app/scripts/install_browser.sh
-
-# Install Python dependencies
-RUN pip install -r requirements.txt
+RUN sed -i 's/sudo //g' /app/scripts/install_browser.sh && \
+    chmod +x /app/scripts/install_browser.sh && \
+    /app/scripts/install_browser.sh && \
+    pip install -r requirements.txt
 
 # Set DISPLAY environment variable
 ENV DISPLAY=:99

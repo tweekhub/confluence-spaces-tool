@@ -33,7 +33,7 @@ class ConfluenceMigrationApp:
 
         # Source 
         self.source_space_id = None
-        self.source_tree: ConfluencePagesTree = None
+        self.source_tree: ConfluencePagesTree = Optional[ConfluencePagesTree]
         self.source_instance = self.app_config.find_instance_by_key("source")
         self.source_api_client = ConfluenceAPIClient(instance_config=self.source_instance,api_config=self.app_config.api_config_data)
         self.source_form = SettingsForm(self.settings_frame,title="Source Confluence",row=1,column=0,sticky="w",config=self.source_instance.to_dict(),update_config=lambda: threading.Thread(target=self.update_source_instance).start())
@@ -42,7 +42,7 @@ class ConfluenceMigrationApp:
 
         # Target
         self.target_space_id = None
-        self.target_tree: ConfluencePagesTree = None
+        self.target_tree: ConfluencePagesTree = Optional[ConfluencePagesTree]
         self.target_instance = self.app_config.find_instance_by_key("target")
         self.target_api_client = ConfluenceAPIClient(instance_config=self.target_instance,api_config=self.app_config.api_config_data)
         self.target_form = SettingsForm(self.settings_frame,title="Target Confluence", row=1,column=1,sticky="e",config=self.target_instance.to_dict(),update_config=lambda: threading.Thread(target=self.update_target_instance).start())
@@ -203,7 +203,7 @@ class ConfluenceMigrationApp:
 
     def copy_pages(self,edit_mode:bool=False):
         if self.target_tree == None:
-            logger.warning("Target Tree not initialized!")
+            logger.warn_tree_not_initialized(is_source=False)
             return 
 
         browser = ConfluenceBrowserClient()
@@ -222,7 +222,7 @@ class ConfluenceMigrationApp:
                     logger.warning(f"Page '{source_node.title}' is not editable, skipping.")
                     continue
             if source_node.title == new_node.title:
-                # logger.debug(f"Title matches: {source_node.title}")
+                logger.debug(f"Title matches: {source_node.title}")
                 source_url = ""
                 if edit_mode:
                     source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id)
@@ -251,7 +251,7 @@ class ConfluenceMigrationApp:
 
     def copy_attachments(self):
         if self.target_tree == None:
-            logger.warning("Target Tree not initialized!")
+            logger.warn_tree_not_initialized(is_source=False)
             return 
         logger.info(f"Copying Attachments to target pages...")
         self.target_tree.rearrange_trees(self.source_tree.root)
@@ -263,7 +263,7 @@ class ConfluenceMigrationApp:
 
     def download_pdfs(self):
         if self.source_tree == None:
-            logger.warning("Source Tree not initialized!")
+            logger.warn_tree_not_initialized(is_source=True)
             return 
         for page in self.source_tree.traverse_tree():
             self.source_api_client.download_pdf(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
@@ -271,7 +271,7 @@ class ConfluenceMigrationApp:
 
     def download_words(self):
         if self.source_tree == None:
-            logger.warning("Source Tree not initialized!")
+            logger.warn_tree_not_initialized(is_source=True)
             return 
         for page in self.source_tree.traverse_tree():
             self.source_api_client.download_word(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
@@ -279,7 +279,7 @@ class ConfluenceMigrationApp:
 
     def download_attachments(self):
         if self.source_tree == None:
-            logger.warning("Source Tree not initialized!")
+            logger.warn_tree_not_initialized(is_source=True)
             return 
         for page in self.source_tree.traverse_tree():
             self.source_tree.fetch_attachments(page)

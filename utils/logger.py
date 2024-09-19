@@ -35,6 +35,9 @@ class ColoredFormatter(logging.Formatter):
         color = self.COLORS.get(record.levelname, self.RESET)
         return f"{color}{super().format(record)}{self.RESET}"
 
+# Define constants
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+
 class Logger:
     _instance = None
     _lock = threading.Lock()
@@ -54,14 +57,14 @@ class Logger:
         # Create a rotating file handler
         file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=30)
         file_handler.setLevel(log_level)
-        file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        file_formatter = logging.Formatter(LOG_FORMAT)
         file_handler.setFormatter(file_formatter)
         self.logger_instance.addHandler(file_handler)
 
         # Create a stream handler for stdout
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setLevel(log_level)
-        stream_formatter = ColoredFormatter('%(asctime)s - %(levelname)s - %(message)s')
+        stream_formatter = ColoredFormatter(LOG_FORMAT)
         stream_handler.setFormatter(stream_formatter)
         self.logger_instance.addHandler(stream_handler)
 
@@ -73,7 +76,7 @@ class Logger:
     def set_text_widget(self, text_widget):
         self.text_handler = LoggingHandlerFrame(text_widget)
         self.text_handler.setLevel(self.logger_instance.level)
-        self.text_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        self.text_handler.setFormatter(logging.Formatter(LOG_FORMAT))
         self.logger_instance.addHandler(self.text_handler)
 
     def debug(self, message):
@@ -90,3 +93,9 @@ class Logger:
 
     def critical(self, message):
         self.logger_instance.critical(message)
+
+    def warn_tree_not_initialized(self,is_source:bool=True):
+        if is_source:
+            self.logger_instance.warning("Source Tree not initialized!")
+        else:
+            self.logger_instance.warning("Target Tree not initialized!")

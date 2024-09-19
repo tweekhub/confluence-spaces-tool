@@ -12,7 +12,7 @@ class ConfluencePagesTree:
         self.api_client = api_client
         self.tree_file = f"tree_{self.api_client.instance_config.name}_{self.api_client.instance_config.root_page_id}.txt"
         self.tree_file_json = f"tree_{self.api_client.instance_config.name}_{self.api_client.instance_config.root_page_id}.json"
-        logger.debug(f"Initialized ConfluencePagesTree with root node: {root.title}")
+        logger.debug(f"Initialized ConfluencePagesTree with root: {root.title}")
 
     def print_pages(self, node: Optional[ConfluencePageNode] = None, level: int = 0):
         current_node = node or self.root
@@ -82,7 +82,6 @@ class ConfluencePagesTree:
             page = ConfluencePageNode.from_api_response(page_data, confluence_type)
             response = self.api_client.get_content(page.id)
             page.set_body(response.json()['body']['storage']['value'])
-            # self.fetch_attachments(page)
 
             # Skip the page if it's in the exclude_page_ids list
             if str(page.id) in exclude_page_ids:
@@ -116,7 +115,7 @@ class ConfluencePagesTree:
         for attachment_data in response.json()['children']['attachment']['results']:
             attachment = ConfluenceAttachmentNode.from_api_response(attachment_data)
             current_node.add_child_attachment(attachment)
-            # logger.debug(f"Added attachment: {attachment.title}")
+            logger.debug(f"Added attachment: {attachment.title}")
 
     def build_tree(self, confluence_type: str, from_label: str = "", exclude_page_ids: list = []):
         logger.info("Building the Confluence pages tree...")
