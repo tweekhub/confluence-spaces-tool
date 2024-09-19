@@ -50,7 +50,7 @@ jobs:
 
       # Upload the binary artifact
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-binary
           path: dist/main
