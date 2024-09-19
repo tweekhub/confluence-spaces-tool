@@ -159,31 +159,22 @@ class ConfluenceAPIClient:
     def get_content_version(self,content_id):
         return self.api_request('GET', 'content', 'get', self.use_v2_for_cloud, path_params={'contentId': content_id}).json().get("version",{}).get("number","")
 
-    def update_content(self,content_id,content_title,body_data,confluence_type):
+    def update_content(self, content_id, content_title, body_data, confluence_type):
         body_field = {
-            "storage": {
-                "value": body_data,
-                "representation": "storage"
-            }
-        } if confluence_type == 'server' else {
-            "representation": "storage",
-            "value": body_data
+            "value": body_data,
+            "representation": "storage"
         }
-        increment_version = self.get_content_version(content_id=content_id)
-        increment_version += 1
+        increment_version = self.get_content_version(content_id) + 1
         payload = {
             "id": content_id,
             "title": content_title,
             "status": "current",
-            "body": body_field,
             "version": {
                 "number": increment_version
-            }
+            },
+            "body": body_field if confluence_type == 'cloud' else {"storage": body_field}
         }
-        self.session.headers.update({"Content-Type": "application/json"})
-        response = self.api_request('PUT', 'content', 'update', self.use_v2_for_cloud, path_params={'contentId': content_id}, data=payload)
-        self.session.headers.pop("Content-Type","")
-        return response
+        return self.api_request('PUT', 'content', 'update', self.use_v2_for_cloud, path_params={'contentId': content_id}, data=payload)
  
     def get_labels(self, content_id):
         return self.api_request('GET', 'label', 'get', 'v1', path_params={'contentId': content_id}).json()['results']

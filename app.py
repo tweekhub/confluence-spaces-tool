@@ -236,7 +236,6 @@ class ConfluenceSpacesApp:
                     logger.debug(f"Title matches: {source_node.title}")
                     source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id) if edit_mode else \
                         f"{self.source_instance.site_url}{self.app_config.get_endpoint(self.source_instance.confluence_type, 'source', 'view')}?pageId={source_node.id}"
-
                     browser.perform_copy_paste(
                         source={
                             'tab_index': 0,
@@ -273,7 +272,8 @@ class ConfluenceSpacesApp:
         response = self.target_api_client.get_content(new_node.id)
         new_node.set_body(response.json()['body']['storage']['value'])
         updated_page = new_node.update_macros()
-        self.target_api_client.update_content(content_id=new_node.id,content_title=new_node.title,body_data=updated_page,confluence_type=self.target_instance.confluence_type)
+        escaped_body_data = updated_page.replace("\n", "").replace('"', '\\"')
+        self.target_api_client.update_content(content_id=new_node.id,content_title=new_node.title,body_data=escaped_body_data,confluence_type=self.target_instance.confluence_type)
 
     def copy_attachments(self):
         def copy_logic():
