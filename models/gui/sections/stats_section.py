@@ -56,10 +56,7 @@ class StatsTable:
                 continue
             if key == "total_pages_copied" and self.title.lower().split(" ")[0] == "source":
                 continue
-            if key == "root_page_title":
-                # Ensure value is a string and truncate if necessary
-                value = str(value)[:32]
-                logger.debug(f"Truncated value for 'root_page_title': {value}")
+            
             # Convert underscored keys to display names with spaces
             display_name = key.replace('_', ' ').title()
 
@@ -89,6 +86,8 @@ class StatsTable:
     def update_stats(self, new_stats):
         for key, value in new_stats.items():
             if key in self.labels:
+                if key == "root_page_title" and len(value) > 55:
+                    value = f"{value[:55]}..."
                 self.labels[key].config(text=value)
 
     def update_current_user_groups(self, current_user_groups):

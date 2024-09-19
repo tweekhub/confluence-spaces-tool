@@ -5,7 +5,7 @@ from tkinter import ttk
 import argparse
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Confluence Space SpacesAssistant")
+    parser = argparse.ArgumentParser(description="Confluence Spaces Tool")
     parser.add_argument("--config-file", default="./configuration.yaml", help="Specify the path to the configuration file")
     parser.add_argument("--api-config-file", default="./confluence-api.json", help="Specify the path to the API configuration file")
     parser.add_argument("--browser-config-file", default="./confluence-elements.json", help="Specify the path to the UI elements configuration file")
@@ -25,7 +25,7 @@ def main():
     logger.set_log_level(log_level=kwargs.pop('log_level').upper())
 
     root = tk.Tk()
-    root.title("Confluence SpacesTool")
+    root.title("Confluence Spaces Tool")
     window_width = 1260
     window_height = 915
     # Set the initial window size

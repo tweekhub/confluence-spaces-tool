@@ -129,7 +129,7 @@ class ConfluenceAPIClient:
 
 
     def get_space_id(self, space_key) -> dict:
-        return self.api_request('GET', 'space', 'get', 'v1', path_params={'spaceKey': space_key}).json()['id']
+        return self.api_request('GET', 'space', 'get', 'v1', path_params={'spaceKey': space_key}).json().get("id","")
 
     def get_content(self, content_id, expand=True) -> dict:
         params = {
@@ -140,14 +140,14 @@ class ConfluenceAPIClient:
         return self.api_request('GET', 'content', 'get', 'v1', path_params={'contentId': content_id}, params=params)
 
     def get_page_title(self, content_id) -> dict:
-        return self.api_request('GET', 'content', 'get', 'v1', path_params={'contentId': content_id}).json()['title']
+        return self.api_request('GET', 'content', 'get', 'v1', path_params={'contentId': content_id}).json().get("title","")
 
     def get_page_id(self, title: str,space_key: str):
         params = {
             'title': title,
             'spaceKey': space_key
         }
-        return self.api_request('GET','rest','base','v1', params=params).json()['results'][0]['id']
+        return self.api_request('GET','rest','base','v1', params=params).json().get("results",{})[0].get("id","")
 
     def create_content(self, data,space_key:str=None) -> dict:
         response = self.api_request('POST', 'content', 'create', self.use_v2_for_cloud, data=data)
@@ -157,7 +157,7 @@ class ConfluenceAPIClient:
         return response.json()['id']
 
     def get_content_version(self,content_id):
-        return self.api_request('GET', 'content', 'get', self.use_v2_for_cloud, path_params={'contentId': content_id}).json()["version"]["number"]
+        return self.api_request('GET', 'content', 'get', self.use_v2_for_cloud, path_params={'contentId': content_id}).json().get("version",{}).get("number","")
 
     def update_content(self,content_id,content_title,body_data,confluence_type):
         body_field = {

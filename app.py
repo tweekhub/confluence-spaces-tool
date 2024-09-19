@@ -290,38 +290,32 @@ class ConfluenceSpacesApp:
         return self.execute_with_stats_update(copy_logic, **kwargs)
 
     def download_pdfs(self):
-        def download():
-            if self.source_tree == None:
-                logger.warn_tree_not_initialized(is_source=True)
-                return 
-            for page in self.source_tree.traverse_tree():
-                self.source_api_client.download_pdf(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
-                self._update_req_stats()
-        return self.execute_with_stats_update(download, **kwargs)
+        if self.source_tree == None:
+            logger.warn_tree_not_initialized(is_source=True)
+            return 
+        for page in self.source_tree.traverse_tree():
+            self.source_api_client.download_pdf(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
+            self._update_req_stats()
 
     def download_words(self):
-        def download():
-            if self.source_tree == None:
-                logger.warn_tree_not_initialized(is_source=True)
-                return 
-            for page in self.source_tree.traverse_tree():
-                self.source_api_client.download_word(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
-                self._update_req_stats()
-        return self.execute_with_stats_update(download, **kwargs)
+        if self.source_tree == None:
+            logger.warn_tree_not_initialized(is_source=True)
+            return 
+        for page in self.source_tree.traverse_tree():
+            self.source_api_client.download_word(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
+        self._update_req_stats()
 
     def download_attachments(self):
-        def download():
-            if self.source_tree == None:
-                logger.warn_tree_not_initialized(is_source=True)
-                return 
-            for page in self.source_tree.traverse_tree():
-                self.source_tree.fetch_attachments(page)
-                if len(page.child_attachments) > 0:
-                    for attachment in page.child_attachments:
-                        file_path = self.source_api_client.download_attachment(page.id, attachment.title,f"{self.download_dir}/attachments/{self.source_api_client.safe_name(page.title)}")
-                        logger.debug(f"Downloaded attachment to {file_path}")
-                        self._update_req_stats()
-        return self.execute_with_stats_update(download, **kwargs)
+        if self.source_tree == None:
+            logger.warn_tree_not_initialized(is_source=True)
+            return 
+        for page in self.source_tree.traverse_tree():
+            self.source_tree.fetch_attachments(page)
+            if len(page.child_attachments) > 0:
+                for attachment in page.child_attachments:
+                    file_path = self.source_api_client.download_attachment(page.id, attachment.title,f"{self.download_dir}/attachments/{self.source_api_client.safe_name(page.title)}")
+                    logger.debug(f"Downloaded attachment to {file_path}")
+        self._update_req_stats()
 
     def _update_stats_realtime(self, stop_event):
         #Continuously updates the stats until the stop_event is set. param stop_event: Event to signal when to stop updating stats.

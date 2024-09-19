@@ -277,7 +277,7 @@ class SettingsForm:
             'space_key': self.space_key_entry.get(),
             'root_page_id': self.root_page_id_entry.get(),
             'label': self.label_entry.get(),
-            'exclude_ids': self.exclude_ids_entry.get().split(', '),
+            'exclude_ids': self.exclude_ids_entry.get().split(','),
             'fetch_pages_limit':self.fetch_pages_limit_entry.get(),
             'fetch_attachments_limit':self.fetch_attachments_limit_entry.get(),
             'credentials':{

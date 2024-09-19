@@ -75,36 +75,38 @@ class ConfluencePagesTree:
 
     def fetch_pages(self, node: Optional[ConfluencePageNode] = None, confluence_type: str = '', from_label: str = "", exclude_page_ids: list = []):
         current_node = node or self.root
-        logger.debug(f"{self.logs_prefix} Fetching pages for node: {current_node.title}, excluding pages with IDs: {exclude_page_ids[0]}")
-
+        logger.debug(f"Fetching pages for node: {current_node.title}, excluding pages with IDs: {exclude_page_ids}")
+        
+        # Get the child pages for the current node
         child_pages = self.api_client.get_child_pages(current_node.id)
-        current_node.child_pages = child_pages
+        
         for page_data in child_pages:
             page = ConfluencePageNode.from_api_response(page_data, confluence_type)
-
-            # Skip the page if it's in the exclude_page_ids list
-            if str(page.id) in exclude_page_ids:
-                logger.warning(f"{self.logs_prefix} Skipping page {page.title} (ID: {page.id}) and its children due to exclude_page_id match")
-                continue  # Skip this page and its children but continue processing siblings
+            
+            # Skip the page if its ID matches the exclude_page_ids
+            if str(page.id) in [str(id) for id in exclude_page_ids]:
+                logger.warning(f"Skipping page {page.title} (ID: {page.id}) due to exclude_page_id match")
+                continue  # Don't fetch children of this excluded page
 
             # Fetch and assign labels
             page.labels = [label['name'] for label in self.api_client.get_labels(page.id)]
 
-            # Apply label-based filtering if 'from_label' is provided
+            # Skip pages with no labels, if 'from_label' filtering is enabled
             if from_label:
                 if not page.labels:
-                    logger.warning(f"{self.logs_prefix} Skipping page {page.title} (ID: {page.id}) as it has no labels")
+                    logger.warning(f"Skipping page {page.title} (ID: {page.id}) as it has no labels")
                     continue
 
+                # Skip the page if it doesn't have the 'from_label'
                 if from_label not in page.labels:
-                    logger.warning(f"{self.logs_prefix} Skipping page {page.title} (ID: {page.id}) due to missing label: {from_label}")
+                    logger.warning(f"Skipping page {page.title} (ID: {page.id}) due to missing label: {from_label}")
                     continue
 
             # Log page details and add it to the current node
-            logger.debug(f"{self.logs_prefix} Adding page {page.title} (ID: {page.id}) with labels: {page.labels}")
+            logger.debug(f"Adding page {page.title} (ID: {page.id}) with labels: {page.labels}")
             current_node.add_child(page)
 
-            # Recursively fetch child pages of this page (only if it's not excluded)
+            # Recursively fetch child pages for this page (while excluding pages in exclude_page_ids)
             self.fetch_pages(page, confluence_type, from_label, exclude_page_ids)
 
     def fetch_attachments(self, node: Optional[ConfluencePageNode] = None):
