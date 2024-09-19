@@ -32,7 +32,7 @@ class ConfluencePageNode:
     def add_parent(self, parent):
         self.parent = parent
     
-    def remove_parent(self, parent):
+    def remove_parent(self):
         self.parent = None
 
     def __str__(self) -> str:
@@ -136,12 +136,12 @@ class ConfluencePageNode:
         replacement = fr'https://{re.escape(target_url)}/wiki/download/attachments/{self.id}/\2'
         
         # Use re.sub to replace all occurrences of the URL pattern with the new format
-        modified_html = re.sub(pattern, replacement, str(self.body))
-        
+        modified_html = str(self.body).replace(pattern,replacement)
+
         # Replace width attribute
         width_pattern = r'ac:width="250"'
-        width_replacement = r'ac:width="650"'
+        width_replacement = r'ac:width="450"'
         
-        modified_size = re.sub(width_pattern, width_replacement, modified_html)
+        modified_size = modified_html.replace(width_pattern, width_replacement)
         
         return modified_size

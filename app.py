@@ -173,7 +173,7 @@ class ConfluenceMigrationApp:
         created_page_id = self.target_api_client.create_content(payload,self.target_instance.space_key)
         self.target_api_client.add_automation_label(content_id=created_page_id,automation_label=self.target_instance.label)
         if len(source_node.labels) > 0:
-            response = self.target_api_client.add_labels(created_page_id, source_node.labels)
+            self.target_api_client.add_labels(created_page_id, source_node.labels)
         if with_attachments:
             self.download_and_upload_attachments(source_node, created_page_id)
         return created_page_id

@@ -83,11 +83,24 @@ class ConfluenceAPIClient:
             raise ValueError(f"{self.logs_prefix} Invalid Authentication Method: {auth_type}")
 
     def api_request(self, method, category, action, api_version="v1", **kwargs):
-        request_kwargs = {}
-        url = f"{self.instance_config.site_url}{self.get_endpoint(category, action, api_version)}"
-        for key, value in kwargs.get('path_params', {}).items():
-            url = url.replace(f"{{{key}}}", str(value))
+        url = self.build_url(category, action, api_version, kwargs.get('path_params', {}))
+        request_kwargs = self.build_request_kwargs(kwargs)
 
+        logger.debug(f"{self.logs_prefix} HTTP_REQ {method} URL: {url} {str(request_kwargs)[:150]}")
+        response = self.session.request(method, url, **request_kwargs)
+
+        self.handle_response(response, category, action)
+
+        return response
+
+    def build_url(self, category, action, api_version, path_params):
+        url = f"{self.instance_config.site_url}{self.get_endpoint(category, action, api_version)}"
+        for key, value in path_params.items():
+            url = url.replace(f"{{{key}}}", str(value))
+        return url
+
+    def build_request_kwargs(self, kwargs):
+        request_kwargs = {}
         if 'data' in kwargs:
             request_kwargs['json'] = kwargs['data']
         if 'params' in kwargs:
@@ -96,9 +109,9 @@ class ConfluenceAPIClient:
             request_kwargs['files'] = kwargs['files']
         if 'allow_redirects' in kwargs:
             request_kwargs['allow_redirects'] = kwargs['allow_redirects']
+        return request_kwargs
 
-        logger.debug(f"{self.logs_prefix} HTTP_REQ {method} URL: {url} {str(request_kwargs)[:150]}")
-        response = self.session.request(method, url, **request_kwargs)
+    def handle_response(self, response, category, action):
         if response.status_code >= 200 and response.status_code < 300:
             self.update_request_stats(
                 is_successful=True,
@@ -113,7 +126,7 @@ class ConfluenceAPIClient:
             self.update_request_stats(is_successful=False)
             if action != "export":
                 logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:250]}...")
-        return response
+
 
     def get_space_id(self, space_key) -> dict:
         return self.api_request('GET', 'space', 'get', 'v1', path_params={'spaceKey': space_key}).json()['id']

@@ -25,7 +25,7 @@ class ConfluenceConfig:
                 logger.debug(f"Successfully loaded configuration from {config_file}")
                 return config
             except yaml.YAMLError as e:
-                raise Exception(f"Error parsing YAML file: {e}")
+                raise yaml.YAMLError(f"Error parsing YAML file: {e}")
 
     def _load_elements_config(self, config_file: str) -> Dict[str, Any]:
         try:
@@ -119,7 +119,7 @@ class ConfluenceConfig:
         for element_data in elements_data:
             if element_data['element_type'] == element_type:
                 return UIElement(element_data)
-        return None
+        return UIElement({"element_type": "default", "name": "default_element"})
 
     def get_endpoint(self, instance_type: str, category: str, action: str, api_version: str = "v1") -> str:
         """Returns the API endpoint based on instance type, category, and action."""

@@ -34,9 +34,9 @@ class ConfluenceBrowserClient:
             self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             self.initial_window_handle = self.driver.current_window_handle
             logger.debug(f"Successfully Initialized Chrome Browser with Initial Window Handle: {self.initial_window_handle}")
-        except WebDriverException as e:
+        except WebDriverException as error:
             logger.error(f"Failed to initialize Chrome browser: {error} ")
-            logger.error("For Ubuntu/Debian Linux run the install script for chrome i.e. ./install_browser.sh")
+            logger.error("For Ubuntu/Debian Linux run the install script for chrome i.e. ./scripts/install_browser.sh")
 
     def _configure_chrome_options(self) -> Options:
         options = Options()
@@ -132,12 +132,6 @@ class ConfluenceBrowserClient:
         self.select_all_and_paste()
         time.sleep(1)
 
-        # if target['page_width_button_selector_value'] and target['page_width_button_selector_type']:
-        #     page_width_button = self.wait_and_find_element(target['page_width_button_selector_value'], target['page_width_button_selector_type'])
-        #     # self.driver.execute_script("arguments[0].click();", page_width_button)
-        #     page_width_button.click()
-        #     logger.debug(f"CLICKED! name={page_width_button.accessible_name}, tag={page_width_button.tag_name}")
-
         save_button = self.wait_and_find_element(target['save_button_selector_value'], target['save_button_selector_type'])
         save_button.click()
 
@@ -179,7 +173,7 @@ class ConfluenceBrowserClient:
     def scroll_to_element(self, element: WebElement)-> WebElement:
         logger.debug(f"Scrolling to name={element.accessible_name}, tag={element.tag_name}")
         self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
-        logger.debug(f"Scrolled Successfully!")
+        logger.debug("Scrolled Successfully!")
         return element
 
     def select_all_and_copy(self):

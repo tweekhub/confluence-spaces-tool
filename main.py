@@ -43,7 +43,7 @@ def main():
     style.configure('TNotebook.Tab', background='#d0d0d0', foreground='black', padding=[10, 5], font=('Arial', 10, 'bold'))
     style.map('TNotebook.Tab', background=[('selected', '#a0a0a0')])  # Change background when selected
 
-    app = ConfluenceMigrationApp(root,**kwargs)
+    ConfluenceMigrationApp(root,**kwargs)
     root.mainloop()
 
 if __name__ == "__main__":

@@ -48,45 +48,45 @@ class Logger:
         return cls._instance
 
     def _initialize_logger(self, log_level, log_file):
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(log_level)
+        self.logger_instance = logging.getLogger(__name__)
+        self.logger_instance.setLevel(log_level)
 
         # Create a rotating file handler
         file_handler = RotatingFileHandler(log_file, maxBytes=5*1024*1024, backupCount=30)
         file_handler.setLevel(log_level)
         file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(file_formatter)
-        self.logger.addHandler(file_handler)
+        self.logger_instance.addHandler(file_handler)
 
         # Create a stream handler for stdout
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setLevel(log_level)
         stream_formatter = ColoredFormatter('%(asctime)s - %(levelname)s - %(message)s')
         stream_handler.setFormatter(stream_formatter)
-        self.logger.addHandler(stream_handler)
+        self.logger_instance.addHandler(stream_handler)
 
     def set_log_level(self, log_level):
-        self.logger.setLevel(log_level)
-        for handler in self.logger.handlers:
+        self.logger_instance.setLevel(log_level)
+        for handler in self.logger_instance.handlers:
             handler.setLevel(log_level)
 
     def set_text_widget(self, text_widget):
         self.text_handler = LoggingHandlerFrame(text_widget)
-        self.text_handler.setLevel(self.logger.level)
+        self.text_handler.setLevel(self.logger_instance.level)
         self.text_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-        self.logger.addHandler(self.text_handler)
+        self.logger_instance.addHandler(self.text_handler)
 
     def debug(self, message):
-        self.logger.debug(message)
+        self.logger_instance.debug(message)
     
     def info(self, message):
-        self.logger.info(message)
+        self.logger_instance.info(message)
     
     def warning(self, message):
-        self.logger.warning(message)
+        self.logger_instance.warning(message)
     
     def error(self, message):
-        self.logger.error(message)
+        self.logger_instance.error(message)
 
     def critical(self, message):
-        self.logger.critical(message)
+        self.logger_instance.critical(message)

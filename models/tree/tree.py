@@ -118,6 +118,6 @@ class ConfluencePagesTree:
             current_node.add_child_attachment(attachment)
             # logger.debug(f"Added attachment: {attachment.title}")
 
-    def build_tree(self, confluence_type: str, from_label: str = "", exclude_page_ids: list = [], json_tree_file_path: str = None):
+    def build_tree(self, confluence_type: str, from_label: str = "", exclude_page_ids: list = []):
         logger.info("Building the Confluence pages tree...")
         self.fetch_pages(confluence_type=confluence_type, from_label=from_label, exclude_page_ids=exclude_page_ids)

@@ -27,7 +27,7 @@ class SettingsForm:
     }
     REST_AUTH_TYPES = ["basic_auth", "cookies_auth", "header_auth"]
 
-    def __init__(self, root, title="Confluence Configuration Form", row=0, column=0, padx=10, pady=10, sticky="w", config=None,update_config:dict={}):
+    def __init__(self, root, title="Confluence Configuration Form", row=0, column=0, padx=10, pady=10, sticky="w", config=None,update_config:dict=None):
         self.root = root
         self.title = title
         self.row = row
@@ -190,10 +190,9 @@ class SettingsForm:
 
         # Validate Exclude IDs
         exclude_ids = self.exclude_ids_entry.get().strip()
-        if exclude_ids:
-            if not self.validate_exclude_ids(exclude_ids):
-                self.exclude_ids_error_label.config(text="Exclude IDs must be a list of digits separated by commas.")
-                valid = False
+        if exclude_ids and not self.validate_exclude_ids(exclude_ids):
+            self.exclude_ids_error_label.config(text="Exclude IDs must be a list of digits separated by commas.")
+            valid = False
 
         # Validate Email
         email = self.email_entry.get().strip()
@@ -311,7 +310,7 @@ class SettingsForm:
 
     def save_config(self):
         if self.validate_fields():
-            config = self.get_selected_values()
+            self.get_selected_values()
             # logger.debug(f"{config.get('name','')} Config Saved: {config}")
             self.set_edit_mode(False)
             self.update_config()

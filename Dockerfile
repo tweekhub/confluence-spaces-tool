@@ -13,19 +13,17 @@ LABEL org.opencontainers.image.licenses=Apache
 
 # Install necessary packages
 RUN apk update && apk add --no-cache \
-    build-base \
     bash \
+    build-base \
     chromium \
+    libffi-dev \
+    tcl \
+    tk \
+    ttf-dejavu \
+    wget \
     xvfb \
     && apk add --no-cache --virtual .build-deps gcc musl-dev python3-tkinter \
-    && apk add --no-cache libffi-dev \
     && pip install --upgrade pip
-
-# Install required dependencies for browser and GUI functionality
-RUN apk add --no-cache bash wget xvfb ttf-dejavu
-
-# Install Tkinter for Alpine (Optional, might need for GUI if missing)
-RUN apk add --no-cache tcl tk
 
 # Copy your Python and config files to the container
 COPY . /app
