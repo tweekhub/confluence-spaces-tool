@@ -22,7 +22,7 @@ jobs:
           - os: macos-latest
             architecture: "arm64"
             build_name: "spaces_tool_macos_arm64"
-            build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_arm64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
+            build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_arm64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" 
             chrome_filename: "chrome-mac-arm64.zip"
             chromedriver_filename: "chromedriver-mac-arm64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
@@ -40,7 +40,7 @@ jobs:
           - os: windows-latest
             architecture: "x64"
             build_name: "spaces_tool_windows_64"
-            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_64" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
+            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_64" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" 
             chrome_filename: "chrome-win64.zip"
             chromedriver_filename: "chromedriver-win64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
@@ -49,7 +49,7 @@ jobs:
           # - os: windows-latest
           #   architecture: "x86"
           #   build_name: "spaces_tool_windows_32"
-          #   build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_32" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
+          #   build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_32" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" 
           #   chrome_filename: "chrome-win32.zip"
           #   chromedriver_filename: "chromedriver-win32.zip"
           #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chrome-win32.zip"
