@@ -1,7 +1,6 @@
 from app import ConfluenceSpacesApp
 from utils.logger import Logger
 import tkinter as tk
-from tkinter import ttk
 import argparse
 
 def parse_arguments():
@@ -16,6 +15,9 @@ def parse_arguments():
     parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
     return parser.parse_args()
 
+def show_about():
+    messagebox.showinfo("About", "Confluence Spaces Tool\nVersion 1.0\nDeveloped by Your Name")
+
 
 def main():
     args = parse_arguments()
@@ -26,22 +28,11 @@ def main():
 
     root = tk.Tk()
     root.title("Confluence Spaces Tool")
+    # Set the initial window size
     window_width = 1260
     window_height = 915
-    # Set the initial window size
     root.geometry(f"{window_width}x{window_height}")
-    root.resizable(False, False)  # Allow resizing in both directions
-    # # Open in full screen mode
-    root.attributes('-fullscreen', False)
-
-    # # Bind the Escape key to exit full screen
-    # root.bind("<Escape>", lambda event: root.attributes('-fullscreen', False))
-    
-    # Create a style object
-    style = ttk.Style()
-    style.configure('TNotebook', background='#f0f0f0')  # Background color for notebook
-    style.configure('TNotebook.Tab', background='#d0d0d0', foreground='black', padding=[10, 5], font=('Arial', 10, 'bold'))
-    style.map('TNotebook.Tab', background=[('selected', '#a0a0a0')])  # Change background when selected
+    root.resizable(False, False)
 
     ConfluenceSpacesApp(root,**kwargs)
     root.mainloop()

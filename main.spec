@@ -1,6 +1,7 @@
 import os
 import sys
 import platform
+from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 
@@ -8,26 +9,40 @@ block_cipher = None
 current_platform = platform.system().lower()
 architecture = 'x64' if sys.maxsize > 2**32 else 'x86'
 
-chrome_portable_path = './chrome_portable'
-chromedriver_path = './chromedriver'
-
-# Set the executable name based on the platform
+# Set the executable name based on the platform and architecture
 if current_platform.startswith('win'):
     exe_name = f'spaces_tool_windows_{architecture}'
+    chrome_portable_path = './chrome_portable/'
+    chromedriver_path = './chromedriver/'
 elif current_platform == 'darwin':
     exe_name = f'spaces_tool_macos_{architecture}'
+    chrome_portable_path = './chrome_portable/'
+    chromedriver_path = './chromedriver/'
 else:
     exe_name = 'spaces_tool_linux'
+    chrome_portable_path = './chrome_portable/'
+    chromedriver_path = './chromedriver/'
 
+# If running inside a PyInstaller bundle, adjust the paths accordingly
+if getattr(sys, 'frozen', False):
+    chrome_portable_path = os.path.join(sys._MEIPASS, 'chrome_portable')
+    chromedriver_path = os.path.join(sys._MEIPASS, 'chromedriver')
+
+# Bundle the required binaries and data files
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
-    datas=[
-        (chrome_portable_path, 'chrome_portable'),
-        (chromedriver_path, 'chromedriver')
+    binaries=[
+        (os.path.join(chromedriver_path, 'chromedriver'), 'chromedriver'),
+        (os.path.join(chrome_portable_path, 'chrome'), 'chrome')
     ],
-    hiddenimports=['tkinter'],
+    datas=[
+        ('confluence-api.json', '.'),
+        ('confluence-elements.json', '.'),
+        ('configuration.yaml', '.'),
+        (chrome_portable_path, 'chrome_portable')
+    ],
+    hiddenimports=collect_submodules('tkinter'),  # Ensure tkinter is bundled
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -54,7 +69,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=True,  # Set to False if you want a windowed application
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

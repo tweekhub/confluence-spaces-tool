@@ -19,51 +19,25 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         include:
-          # - os: macos-latest
-          #   architecture: "arm64"
-          #   build_name: "spaces_tool_macos_arm64"
-          #   build_cmd: pipenv run pyinstaller main.spec
-          #   chrome_filename: "chrome-mac-arm64.zip"
-          #   chromedriver_filename: "chromedriver-mac-arm64.zip"
-          #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
-          #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chromedriver-mac-arm64.zip"
-          #   release_file: dist/spaces_tool_macos_arm64
           - os: ubuntu-latest
-            build_name: "spaces_tool_linux"
+            build_name: "${{ env.APP_NAME }}_linux"
             install_extra: sudo apt-get install -y python3-tk
             build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-linux64.zip"
             chromedriver_filename: "chromedriver-linux64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chrome-linux64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chromedriver-linux64.zip"
-            release_file: dist/spaces_tool_linux
+            release_file: dist/${{ env.APP_NAME }}_linux
           - os: windows-latest
             architecture: "x64"
-            build_name: "spaces_tool_windows_64"
+            build_name: "${{ env.APP_NAME }}_windows_64"
             build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-win64.zip"
             chromedriver_filename: "chromedriver-win64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chromedriver-win64.zip"
-            release_file: dist/spaces_tool_windows_64.exe
-          # - os: windows-latest
-          #   architecture: "x86"
-          #   build_name: "spaces_tool_windows_32"
-          #   build_cmd: pipenv run pyinstaller main.spec
-          #   chrome_filename: "chrome-win32.zip"
-          #   chromedriver_filename: "chromedriver-win32.zip"
-          #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chrome-win32.zip"
-          #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chromedriver-win32.zip"
-          #   release_file: dist/spaces_tool_windows_32.exe
-          # - os: macos-latest
-          #   architecture: "x64"
-          #   build_name: "spaces_tool_macos_x64"
-          #   chrome_filename: "chrome-mac-x64.zip"
-          #   chromedriver_filename: "chromedriver-mac-x64.zip"
-          #   build_cmd: pipenv run pyinstaller main.spec
-          #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chrome-mac-x64.zip"
-          #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chromedriver-mac-x64.zip"
-          #   release_file: dist/spaces_tool_macos_x64
+            release_file: dist/${{ env.APP_NAME }}_windows_64.exe
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -158,6 +158,8 @@ class ConfluenceAPIClient:
 
     def get_content_version(self,content_id):
         return self.api_request('GET', 'content', 'get', self.use_v2_for_cloud, path_params={'contentId': content_id}).json().get("version",{}).get("number","")
+
+    # TODO: Fix this method
     def update_content(self, content_id, content_title, body_data, confluence_type):
         headers = {
             "Content-Type": "application/json"
@@ -280,23 +282,28 @@ class ConfluenceAPIClient:
     def download_pdf(self, content_id, content_name, download_dir):
         logger.info(f"{content_name} {download_dir}")
 
-        # Safely create the filename and directory path
-        filename = f"{self.safe_name(content_name)}.pdf"
-        download_path = Path(download_dir) / "pdf" / filename
-        download_path.parent.mkdir(parents=True, exist_ok=True)  # Create the directory if it doesn't exist
-        params = {
-            'pageId': content_id
-        }
-        # Perform the API request
-        response = self.api_request('GET', 'export', 'pdf', 'v1', params=params)
-        # Check if the response is successful
-        if response.status_code == 200:
-            # Write the response content to a file
-            with open(download_path, 'wb') as pdf_file:
-                pdf_file.write(response.content)
-            logger.debug(f"{self.logs_prefix} '{content_name}' PDF document downloaded at: {download_path}")
-        else:
-            logger.error(f"Failed to download PDF for '{content_name}'. Status code: {response.status_code}")
+        try:
+            # Safely create the filename and directory path
+            filename = f"{self.safe_name(content_name)}.pdf"
+            download_path = Path(download_dir) / "pdf" / filename
+            download_path.parent.mkdir(parents=True, exist_ok=True)  # Create the directory if it doesn't exist
+            params = {
+                'pageId': content_id
+            }
+            # Perform the API request
+            response = self.api_request('GET', 'export', 'pdf', 'v1', params=params)
+            # Check if the response is successful
+            if response.status_code == 200:
+                # Write the response content to a file
+                with open(download_path, 'wb') as pdf_file:
+                    pdf_file.write(response.content)
+                logger.debug(f"{self.logs_prefix} '{content_name}' PDF document downloaded at: {download_path}")
+            else:
+                logger.error(f"Failed to download PDF for '{content_name}'. Status code: {response.status_code}")
+        except OSError as e:
+            logger.error(f"Failed to write PDF document for '{content_name}' to {download_path}. OS error: {e}")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred while writing PDF document for '{content_name}' to {download_path}. Error: {e}")
 
     def download_word(self, content_id, content_name, download_dir):
         filename = f"{self.safe_name(content_name)}.doc"
@@ -310,10 +317,15 @@ class ConfluenceAPIClient:
         response = self.api_request('GET', 'export', 'word', 'v1', params=params)
         # Check if the response is successful
         if response.status_code == 200:
-            # Write the response content to a file
-            with open(download_path, 'wb') as word_file:
-                word_file.write(response.content)
-            logger.debug(f"{self.logs_prefix} '{content_name}' Word document downloaded at: {download_path}")
+            try:
+                # Write the response content to a file
+                with open(download_path, 'wb') as word_file:
+                    word_file.write(response.content)
+                logger.debug(f"{self.logs_prefix} '{content_name}' Word document downloaded at: {download_path}")
+            except OSError as e:
+                logger.error(f"Failed to write Word document for '{content_name}' to {download_path}. OS error: {e}")
+            except Exception as e:
+                logger.error(f"An unexpected error occurred while writing Word document for '{content_name}' to {download_path}. Error: {e}")
         else:
             logger.error(f"Failed to download Word document for '{content_name}'. Status code: {response.status_code}")
 
@@ -333,13 +345,13 @@ class ConfluenceAPIClient:
             # Sanitize the name part and Recombine with the original extension
             safe_filename = f"{self.safe_name(name)}{ext}"
             # Determine the file path and save the file
-            cwd = os.getcwd()
-            file_path = os.path.join(cwd, download_dir, safe_filename)
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            cwd = Path.cwd()
+            file_path = cwd / download_dir / safe_filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
             
             with open(file_path, 'wb') as f:
                 f.write(content)
             
-            return file_path
+            return str(file_path)
         except Exception as e:
             raise ValueError(f"Failed to save file {file_path}: {e}")

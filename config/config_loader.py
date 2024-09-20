@@ -29,26 +29,28 @@ class ConfluenceConfig:
                 raise yaml.YAMLError(f"Error parsing YAML file: {e}")
 
     def _load_elements_config(self, config_file: str) -> Dict[str, Any]:
-        try:
-            with open(config_file, 'r') as f:
-                config: Dict[str, Any] = json.load(f)
-            logger.debug(f"Successfully loaded Browser config from {config_file}")
-            return config
-        except FileNotFoundError:
-            raise FileNotFoundError(f"{config_file} file not found")
-        except json.JSONDecodeError:
-            raise json.JSONDecodeError(f"Error decoding {config_file}")
+        config_path = Path(config_file)
+        if not config_path.exists():
+            raise FileNotFoundError(f"Configuration file not found: {config_file}")
+        with open(config_path, 'r') as file:
+            try:
+                config: Dict[str, Any] = json.load(file)
+                logger.debug(f"Successfully loaded Browser config from {config_file}")
+                return config
+            except json.JSONDecodeError as e:
+                raise json.JSONDecodeError(f"Error decoding JSON file: {e}")
 
     def _load_api_config(self, config_file: str) -> Dict[str, Any]:
-        try:
-            with open(config_file, 'r') as f:
-                config: Dict[str, Any] = json.load(f)
-            logger.debug(f"Successfully loaded API Config from {config_file}")
-            return config
-        except FileNotFoundError:
-            raise FileNotFoundError(f"{config_file} file not found")
-        except json.JSONDecodeError:
-            raise json.JSONDecodeError(f"Error decoding {config_file}")
+        config_path = Path(config_file)
+        if not config_path.exists():
+            raise FileNotFoundError(f"Configuration file not found: {config_file}")
+        with open(config_path, 'r') as file:
+            try:
+                config: Dict[str, Any] = json.load(file)
+                logger.debug(f"Successfully loaded API Config from {config_file}")
+                return config
+            except json.JSONDecodeError as e:
+                raise json.JSONDecodeError(f"Error decoding JSON file: {e}")
 
     def _load_confluence_instance(self, instance_data: dict) -> ConfluenceInstance:
         if not instance_data:

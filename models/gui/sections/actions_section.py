@@ -55,7 +55,7 @@ class ActionsSection:
         self.create_section()
 
     def create_section(self):
-        action_frame = tk.LabelFrame(self.parent, text="Actions")
+        action_frame = ttk.LabelFrame(self.parent, text="Actions")
         action_frame.grid(row=self.row, column=self.column, padx=self.padx, pady=self.pady, sticky=self.sticky)
 
         # Use options from config to create comboboxes and buttons

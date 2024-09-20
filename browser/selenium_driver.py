@@ -15,6 +15,8 @@ import time
 import os
 from config.config_types import UIElement
 from typing import List
+import sys
+import platform
 
 class ConfluenceBrowserClient:
     def __init__(self, username:str="", password:str="", mfa_secret_key:str="", timeout_after: int = 15, max_retries: int = 5,browser_headless:bool=False,is_experimental:bool=True):
@@ -30,25 +32,47 @@ class ConfluenceBrowserClient:
 
     def initialize_driver(self):
         logger.debug(f"Using username={self.username}, timeout_after={self.timeout_after}, max_retries={self.max_retries}, browser_headless={self.browser_headless}, is_experimental={self.is_experimental}")
+        
         options = self._configure_chrome_options()
+        
+        # Determine platform and architecture
+        current_platform = platform.system().lower()
+        architecture = platform.machine().lower()
+
+        # Determine if running in PyInstaller bundled mode
+        base_path = sys._MEIPASS if getattr(sys, 'frozen', False) else os.getcwd()
+
+        # Set Chrome binary and ChromeDriver paths based on platform and architecture
+        if current_platform.startswith('win'):
+            chrome_binary_name = 'chrome.exe'
+        elif current_platform == 'darwin':
+            # macOS (both x64 and arm64)
+            if architecture == 'arm64':
+                chrome_binary_name = 'chrome-arm64'
+            else:
+                chrome_binary_name = 'chrome'
+        else:
+            # Linux and other Unix-like systems
+            chrome_binary_name = 'chrome'
+
+        # Construct paths for Chrome binary and ChromeDriver
+        chrome_binary_path = os.path.join(base_path, 'chrome_portable', chrome_binary_name)
+        chrome_driver_path = os.path.join(base_path, 'chrome_driver')
+
         try:
-            self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+            # For bundled mode
+            if getattr(sys, 'frozen', False):
+                service = Service(executable_path=chrome_driver_path)
+                options.binary_location = chrome_binary_path
+            else: # For dev mode
+                service = Service(ChromeDriverManager().install()) 
+            self.driver = webdriver.Chrome(service=service, options=options)
             self.initial_window_handle = self.driver.current_window_handle
             logger.debug(f"Successfully Initialized Chrome Browser with Initial Window Handle: {self.initial_window_handle}")
+
         except WebDriverException as error:
             logger.warning(f"Failed to initialize Chrome browser: {error}")
-            logger.warning("For Ubuntu/Debian Linux, ensure Chrome is installed or run the install script: ./scripts/install_browser.sh")
-            # Fallback to the locally packaged Chrome and ChromeDriver
-            try:
-                chrome_driver_path = os.path.join(os.getcwd(), 'chromedriver')
-                chrome_binary_path = os.path.join(os.getcwd(), 'chrome_portable', 'chrome')
-                options.binary_location = chrome_binary_path  # Use the packaged Chrome binary
-                self.driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
-                self.initial_window_handle = self.driver.current_window_handle
-                logger.debug(f"Successfully Initialized Chrome Browser with Fallback using Local Chrome Binary and Driver. Initial Window Handle: {self.initial_window_handle}")
-            except WebDriverException as fallback_error:
-                logger.error(f"Failed to initialize Chrome browser with the locally packaged Chrome and ChromeDriver: {fallback_error}")
-                logger.warning("For Ubuntu/Debian Linux, ensure Chrome is installed or run the install script: ./scripts/install_browser.sh")
+            logger.error("Ensure that the Chrome Portable and ChromeDriver binaries are correctly bundled.")
 
 
     def _configure_chrome_options(self) -> Options:
