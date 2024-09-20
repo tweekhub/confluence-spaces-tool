@@ -12,16 +12,16 @@ architecture = 'x64' if sys.maxsize > 2**32 else 'x86'
 # Set the executable name based on the platform and architecture
 if current_platform.startswith('win'):
     exe_name = f'spaces_tool_windows_{architecture}'
-    chrome_portable_path = './confluence-spaces-tool/chrome_portable/'
-    chromedriver_path = './confluence-spaces-tool/chromedriver/'
+    chrome_portable_path = '/home/runner/work/confluence-spaces-tool/chrome_portable/'
+    chromedriver_path = '/home/runner/work/confluence-spaces-tool/chromedriver/'
 elif current_platform == 'darwin':
     exe_name = f'spaces_tool_macos_{architecture}'
-    chrome_portable_path = './confluence-spaces-tool/chrome_portable/'
-    chromedriver_path = './confluence-spaces-tool/chromedriver/'
+    chrome_portable_path = '/home/runner/work/confluence-spaces-tool/chrome_portable/'
+    chromedriver_path = '/home/runner/work/confluence-spaces-tool/chromedriver/'
 else:
     exe_name = 'spaces_tool_linux'
-    chrome_portable_path = './confluence-spaces-tool/chrome_portable/'
-    chromedriver_path = './confluence-spaces-tool/chromedriver/'
+    chrome_portable_path = '/home/runner/work/confluence-spaces-tool/chrome_portable/'
+    chromedriver_path = '/home/runner/work/confluence-spaces-tool/chromedriver/'
 
 # If running inside a PyInstaller bundle, adjust the paths accordingly
 if getattr(sys, 'frozen', False):
@@ -37,9 +37,9 @@ a = Analysis(
         (os.path.join(chrome_portable_path, 'chrome'), 'chrome')
     ],
     datas=[
-        ('confluence-spaces-tool/confluence-api.json', '.'),
-        ('confluence-spaces-tool/confluence-elements.json', '.'),
-        ('confluence-spaces-tool/configuration.yaml', '.'),
+        ('confluence-api.json', '.'),
+        ('confluence-elements.json', '.'),
+        ('configuration.yaml', '.'),
         (chrome_portable_path, 'chrome_portable')
     ],
     hiddenimports=collect_submodules('tkinter'),  # Ensure tkinter is bundled
