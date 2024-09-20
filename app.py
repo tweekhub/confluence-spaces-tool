@@ -201,16 +201,16 @@ class ConfluenceSpacesApp:
             self.download_and_upload_attachments(source_node, created_page_id)
         return created_page_id
 
-    def create_pages_in_order(self, node: ConfluencePageNode = None, parent_id: str = None,with_attachments: bool = False):
+    def create_pages_in_order(self, node: Optional[ConfluencePageNode] = None, parent_id: Optional[str] = None, with_attachments: bool = False):
         self._update_req_stats()
         if node is None:
             node = self.source_tree.root
         try:
             node.labels = [label['name'] for label in self.source_api_client.get_labels(node.id)]
             node.child_pages = self.source_api_client.get_child_pages(node.id)
-            created_page_id = self._create_page(parent_id=parent_id,source_node=node,with_attachments=with_attachments)
-            for child_node in node.children:
-                self.create_pages_in_order(child_node, created_page_id,with_attachments)
+            created_page_id = self._create_page(parent_id=parent_id, source_node=node, with_attachments=with_attachments)
+            for child_node in node.child_pages:
+                self.create_pages_in_order(child_node, created_page_id, with_attachments)
         except Exception as e:
             logger.error(f"Error Creating Page with title: '{node.title}' Reason: {str(e)}")
 
