@@ -17,39 +17,39 @@ jobs:
         include:
           # - os: macos-latest
           #   architecture: "x64"
-          #   build_name: "${{ env.APP_NAME }}_macos_x64"
-          #   build_cmd: pipenv run pyinstaller --name "${{ env.APP_NAME }}_macos_x64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
+          #   build_name: "spaces_tool_macos_x64"
+          #   build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_x64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
           #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chrome-mac-x64.zip"
           #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chromedriver-mac-x64.zip"
-          #   release_file: dist/${{ env.APP_NAME }}_macos_x64
+          #   release_file: dist/spaces_tool_macos_x64
           - os: macos-latest
             architecture: "arm64"
-            build_name: "${{ env.APP_NAME }}_macos_arm64"
-            build_cmd: pipenv run pyinstaller --name "${{ env.APP_NAME }}_macos_arm64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
+            build_name: "spaces_tool_macos_arm64"
+            build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_arm64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chromedriver-mac-arm64.zip"
-            release_file: dist/${{ env.APP_NAME }}_macos_arm64
+            release_file: dist/spaces_tool_macos_arm64
           - os: ubuntu-latest
-            build_name: "${{ env.APP_NAME }}_linux"
+            build_name: "spaces_tool_linux"
             install_extra: sudo apt-get install python3-tk
-            build_cmd: pipenv run pyinstaller --hidden-import=tkinter --name="${{ env.APP_NAME }}_linux" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile linux_app.spec
+            build_cmd: pipenv run pyinstaller --hidden-import=tkinter --name="spaces_tool_linux" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile linux_app.spec
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chrome-linux64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chromedriver-linux64.zip"
-            release_file: dist/${{ env.APP_NAME }}_linux
+            release_file: dist/spaces_tool_linux
           - os: windows-latest
             architecture: "x64"
-            build_name: "${{ env.APP_NAME }}_windows_64"
-            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="${{ env.APP_NAME }}_windows_64" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
+            build_name: "spaces_tool_windows_64"
+            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_64" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chromedriver-win64.zip"
-            release_file: dist/${{ env.APP_NAME }}_windows_64.exe
+            release_file: dist/spaces_tool_windows_64.exe
           # - os: windows-latest
           #   architecture: "x86"
-          #   build_name: "${{ env.APP_NAME }}_windows_32"
-          #   build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="${{ env.APP_NAME }}_windows_32" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
+          #   build_name: "spaces_tool_windows_32"
+          #   build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_32" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
           #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chrome-win32.zip"
           #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chromedriver-win32.zip"
-          #   release_file: dist/${{ env.APP_NAME }}_windows_32.exe
+          #   release_file: dist/spaces_tool_windows_32.exe
 
     steps:
       - name: Checkout code
