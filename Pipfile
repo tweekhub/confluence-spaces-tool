@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pyinstaller = "*"
+pywin32-ctypes = "*"
+pefile = "*"
+macholib = "*"
+pillow = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3"

@@ -2,7 +2,6 @@ name: Build App for Linux
 
 on:
   workflow_dispatch: 
-  push:
   pull_request:
     branches: [ master ]
   release:
@@ -28,7 +27,7 @@ jobs:
 
       - name: Install virtual envs and dependencies
         run: |
-          python3 -m pip3 install --upgrade pipenv wheel
+          python3 -m pip install --upgrade pipenv wheel
 
       - id: cache-pipenv
         uses: actions/cache@v4
