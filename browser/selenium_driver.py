@@ -12,6 +12,7 @@ from selenium.common.exceptions import WebDriverException,TimeoutException, NoSu
 import pyotp
 from . import logger
 import time
+import os
 from config.config_types import UIElement
 from typing import List
 
@@ -35,8 +36,20 @@ class ConfluenceBrowserClient:
             self.initial_window_handle = self.driver.current_window_handle
             logger.debug(f"Successfully Initialized Chrome Browser with Initial Window Handle: {self.initial_window_handle}")
         except WebDriverException as error:
-            logger.error(f"Failed to initialize Chrome browser: {error} ")
-            logger.error("For Ubuntu/Debian Linux run the install script for chrome i.e. ./scripts/install_browser.sh")
+            logger.warning(f"Failed to initialize Chrome browser: {error}")
+            logger.warning("For Ubuntu/Debian Linux, ensure Chrome is installed or run the install script: ./scripts/install_browser.sh")
+            # Fallback to the locally packaged Chrome and ChromeDriver
+            try:
+                chrome_driver_path = os.path.join(os.getcwd(), 'chromedriver')
+                chrome_binary_path = os.path.join(os.getcwd(), 'chrome_portable', 'chrome')
+                options.binary_location = chrome_binary_path  # Use the packaged Chrome binary
+                self.driver = webdriver.Chrome(service=Service(chrome_driver_path), options=options)
+                self.initial_window_handle = self.driver.current_window_handle
+                logger.debug(f"Successfully Initialized Chrome Browser with Fallback using Local Chrome Binary and Driver. Initial Window Handle: {self.initial_window_handle}")
+            except WebDriverException as fallback_error:
+                logger.error(f"Failed to initialize Chrome browser with the locally packaged Chrome and ChromeDriver: {fallback_error}")
+                logger.warning("For Ubuntu/Debian Linux, ensure Chrome is installed or run the install script: ./scripts/install_browser.sh")
+
 
     def _configure_chrome_options(self) -> Options:
         options = Options()

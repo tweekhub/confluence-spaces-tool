@@ -1,15 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 block_cipher = None
 
+chrome_portable_path = './path_to_chrome_portable'
+chromedriver_path = './path_to_chromedriver'
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=[],
+    datas=[(chrome_portable_path, 'chrome_portable'), (chromedriver_path, 'chromedriver')],
+    hiddenimports=['tkinter'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -19,6 +20,7 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
