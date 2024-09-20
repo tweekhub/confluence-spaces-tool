@@ -28,7 +28,7 @@ jobs:
             release_file: dist/spaces_tool_linux
           - os: windows-latest
             architecture: "x64"
-            build_name: "spaces_tool_windows_64"
+            build_name: "spaces_tool_windows_64.exe"
             build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-win64.zip"
             chromedriver_filename: "chromedriver-win64.zip"

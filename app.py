@@ -73,18 +73,8 @@ class ConfluenceSpacesApp:
         if self.source_instance.credentials.rest_auth_type != "cookies_auth":
             self.source_api_client.initialize_session()
         else:
-            browser = ConfluenceBrowserClient()
-            browser.initialize_driver()
-            browser.open_page_in_same_tab(self.source_instance.site_url + self.source_instance.home_path)
-            browser.set_credentials(self.source_instance.credentials.email, self.source_instance.credentials.password, self.source_instance.credentials.mfa_secret_key)
-            browser.process_elements_chain(self.app_config.get_elements_list(self.source_instance.confluence_type,'login_page'))
-            self.source_api_client.initialize_session(cookies=browser.driver.get_cookies())
-            self.actions_section.update_button_state('download','readonly',"normal")
-            browser.close_driver()
-        self.source_space_id = self.source_api_client.get_space_id(self.source_instance.space_key)
-        self.source_stats.update_stats({"space_id": self.source_space_id,"root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id)})
-        self.source_stats.update_current_user_groups(self.source_api_client.get_user_groups())
-        self._update_req_stats()
+            self._initialize_browser_and_login(self.source_instance, self.source_api_client)
+        self._update_source_stats()
 
     def update_target_instance(self):
         updated_data = self.target_form.get_selected_values()
@@ -94,38 +84,47 @@ class ConfluenceSpacesApp:
         if self.target_instance.credentials.rest_auth_type != "cookies_auth":
             self.target_api_client.initialize_session()
         else:
-            browser = ConfluenceBrowserClient()
-            browser.initialize_driver()
-            browser.open_page_in_same_tab(self.target_instance.site_url + self.target_instance.home_path)
-            browser.set_credentials(self.target_instance.credentials.email, self.target_instance.credentials.password, self.target_instance.credentials.mfa_secret_key)
-            browser.process_elements_chain(self.app_config.get_elements_list(self.target_instance.confluence_type,'login_page'))
-            self.target_api_client.initialize_session(cookies=browser.driver.get_cookies())
-            browser.close_driver()
-        self.target_space_id = self.target_api_client.get_space_id(self.target_instance.space_key)
-        self.target_stats.update_stats({"space_id": self.target_space_id,"root_page_title": self.target_api_client.get_page_title(self.target_instance.root_page_id)})
-        self.target_stats.update_current_user_groups(self.target_api_client.get_user_groups())
-        self._update_req_stats()
+            self._initialize_browser_and_login(self.target_instance, self.target_api_client)
+        self._update_target_stats()
 
     def fetch_source_tree(self):
         self.update_source_instance()
-        root_page = self.source_api_client.get_content(self.source_instance.root_page_id)
-        root_node = ConfluencePageNode.from_api_response(root_page.json(), self.source_instance.confluence_type)
-        self.source_tree = ConfluencePagesTree(root_node, self.source_api_client)
-        self.source_tree.build_tree(self.source_instance.confluence_type,from_label=self.source_instance.label,exclude_page_ids=self.source_instance.exclude_ids)
-        self.source_tree.print_pages()
-        self.actions_section.update_button_state("save","readonly","normal")
-        self.actions_section.update_button_state("create_pages","readonly","normal")
-        self._update_req_stats()
+        self._fetch_tree(self.source_instance, self.source_api_client, self.source_tree, self.source_stats)
+        self.actions_section.update_button_state("save", "readonly", "normal")
+        self.actions_section.update_button_state("create_pages", "readonly", "normal")
 
     def fetch_target_tree(self):
         self.update_target_instance()
-        root_page = self.target_api_client.get_content(self.target_instance.root_page_id)
-        root_node = ConfluencePageNode.from_api_response(root_page.json(), self.target_instance.confluence_type)
-        self.target_tree = ConfluencePagesTree(root_node, self.target_api_client)
-        self.target_tree.build_tree(self.target_instance.confluence_type,from_label=self.target_instance.label,exclude_page_ids=self.target_instance.exclude_ids)
-        self.target_tree.print_pages()
-        self.actions_section.update_button_state("save","readonly","normal")
+        self._fetch_tree(self.target_instance, self.target_api_client, self.target_tree, self.target_stats)
+        self.actions_section.update_button_state("save", "readonly", "normal")
         self._update_req_stats()
+
+    def _initialize_browser_and_login(self, instance, api_client):
+        browser = ConfluenceBrowserClient()
+        browser.initialize_driver()
+        self._login_to_instance(browser, instance, same_tab=True)
+        api_client.initialize_session(cookies=browser.driver.get_cookies())
+        browser.close_driver()
+
+    def _update_source_stats(self):
+        self.source_space_id = self.source_api_client.get_space_id(self.source_instance.space_key)
+        self.source_stats.update_stats({"space_id": self.source_space_id, "root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id)})
+        self.source_stats.update_current_user_groups(self.source_api_client.get_user_groups())
+        self._update_req_stats()
+
+    def _update_target_stats(self):
+        self.target_space_id = self.target_api_client.get_space_id(self.target_instance.space_key)
+        self.target_stats.update_stats({"space_id": self.target_space_id, "root_page_title": self.target_api_client.get_page_title(self.target_instance.root_page_id)})
+        self.target_stats.update_current_user_groups(self.target_api_client.get_user_groups())
+        self._update_req_stats()
+
+    def _fetch_tree(self, instance, api_client, tree, stats):
+        root_page = api_client.get_content(instance.root_page_id)
+        root_node = ConfluencePageNode.from_api_response(root_page.json(), instance.confluence_type)
+        tree = ConfluencePagesTree(root_node, api_client)
+        tree.build_tree(instance.confluence_type, from_label=instance.label, exclude_page_ids=instance.exclude_ids)
+        tree.print_pages()
+        stats.update_stats({"space_id": instance.space_key, "root_page_title": api_client.get_page_title(instance.root_page_id)})
 
     def save_source_trees(self):
         if self.source_tree:
@@ -159,11 +158,27 @@ class ConfluenceSpacesApp:
         return result
 
     def create_pages(self, with_attachments: bool = False):
-        root_page = self.target_api_client.get_content(self.target_instance.root_page_id)
-        root_node = ConfluencePageNode.from_api_response(root_page.json(), self.target_instance.confluence_type)
-        self.target_tree = ConfluencePagesTree(root_node, self.target_api_client)
-        return self.execute_with_stats_update(self.create_pages_in_order, self.source_tree.root, self.target_instance.root_page_id, with_attachments)
-
+        # Start the real-time stats update in a separate thread
+        stop_event = threading.Event()  # Event to signal when to stop the stats thread
+        stats_thread = threading.Thread(target=self._update_stats_realtime, args=(stop_event,))
+        stats_thread.start()
+        try: # Create pages in order, which can take time
+            self.target_tree = None
+            root_page = self.target_api_client.get_content(self.target_instance.root_page_id)
+            root_node = ConfluencePageNode.from_api_response(root_page.json(), self.target_instance.confluence_type)
+            self.target_tree = ConfluencePagesTree(root_node, self.target_api_client)
+            self.create_pages_in_order(self.source_tree.root, self.target_instance.root_page_id, with_attachments)
+        finally:
+            # Stop the real-time stats update once page creation is done
+            stop_event.set()  # Signal the stats thread to stop
+            stats_thread.join()  # Wait for the stats thread to finish
+        # Final update of the stats after the creation process
+        self.target_stats.update_stats({
+            "total_pages_created": self.target_api_client.total_pages_created,
+            "total_attachments_created": self.target_api_client.total_attachments_created
+        })
+        self._update_req_stats()  # Final stats update
+        
     def _create_page(self,parent_id,source_node: ConfluencePageNode,with_attachments: bool = False):
         self._update_req_stats()
         payload = {
@@ -233,13 +248,16 @@ class ConfluenceSpacesApp:
         return self.execute_with_stats_update(copy_logic, **kwargs)
 
     def _login_to_instances(self, browser):
-        browser.open_page_in_same_tab(self.source_instance.site_url + self.source_instance.home_path)
-        browser.set_credentials(self.source_instance.credentials.email, self.source_instance.credentials.password, self.source_instance.credentials.mfa_secret_key)
-        browser.process_elements_chain(self.app_config.get_elements_list(self.source_instance.confluence_type, 'login_page'))
+        self._login_to_instance(browser, self.source_instance, same_tab=True)
+        self._login_to_instance(browser, self.target_instance, same_tab=False)
 
-        browser.open_new_tab(self.target_instance.site_url + self.target_instance.home_path)
-        browser.set_credentials(self.target_instance.credentials.email, self.target_instance.credentials.password, self.target_instance.credentials.mfa_secret_key)
-        browser.process_elements_chain(self.app_config.get_elements_list(self.target_instance.confluence_type, 'login_page'))
+    def _login_to_instance(self, browser, instance, same_tab):
+        if same_tab:
+            browser.open_page_in_same_tab(instance.site_url + instance.home_path)
+        else:
+            browser.open_new_tab(instance.site_url + instance.home_path)
+        browser.set_credentials(instance.credentials.email, instance.credentials.password, instance.credentials.mfa_secret_key)
+        browser.process_elements_chain(self.app_config.get_elements_list(instance.confluence_type, 'login_page'))
 
     def _is_page_editable(self, source_node):
         if not self.source_api_client.get_page_restrictions(source_node.id):
