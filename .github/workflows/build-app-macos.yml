@@ -1,6 +1,7 @@
 name: Build App for Mac
 
 on:
+  workflow_dispatch: 
   push:
     tags:
      - "*"
