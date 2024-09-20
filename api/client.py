@@ -1,7 +1,6 @@
 from . import logger
 from config.config_types import ConfluenceInstance
 from requests.auth import HTTPBasicAuth
-from selenium import webdriver
 import requests
 import re
 import json
@@ -121,11 +120,11 @@ class ConfluenceAPIClient:
                 download_attachment=(category == 'attachment' and action == 'download')
             )
             if action != "export":
-                logger.debug(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text}...")
+                logger.debug(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:150]}...")
         else:
             self.update_request_stats(is_successful=False)
             if action != "export":
-                logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text}...")
+                logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:250]}...")
 
 
     def get_space_id(self, space_key) -> dict:

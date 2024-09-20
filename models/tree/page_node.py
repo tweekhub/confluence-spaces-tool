@@ -1,12 +1,11 @@
 import re
-from urllib.parse import urlparse, urlunparse
 from typing import List, Optional
 from . import logger
 
 class ConfluencePageNode:
-    def __init__(self, page_id: str, title: str, page_type: str="", status: str="", edit_link: str="", webui_link: str="", 
+    def __init__(self, page_id: str, title: str, page_type: str = "", status: str = "", edit_link: str = "", webui_link: str = "", 
                  labels: Optional[List[str]] = None, child_pages: Optional[List[dict]] = None, 
-                 child_attachments: Optional[List['ConfluenceAttachmentNode']] = None, parent: Optional['ConfluencePage'] = None):
+                 child_attachments: Optional[List['ConfluenceAttachmentNode']] = None, parent: Optional['ConfluencePageNode'] = None):
         self.id = int(page_id)
         self.type = page_type
         self.status = status
@@ -20,39 +19,20 @@ class ConfluencePageNode:
         self.body: Optional[str] = None
         self.macros: List[str] = []
         self.children = []
-        self.parent = parent
-        
-    def add_child(self, child):
+
+    def add_child(self, child: 'ConfluencePageNode'):
         self.children.append(child)
-    
-    def remove_child(self, child):
-        self.children.remove(child)
 
-    def add_parent(self, parent):
-        self.parent = parent
-    
-    def remove_parent(self):
-        self.parent = None
-
-    def __str__(self) -> str:
-        return f"ConfluencePage(id={self.id}, title={self.title})"
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
-    def add_child_page(self, child_page: 'ConfluencePage') -> None:
-        self.child_pages.append(child_page)
-
-    def add_child_attachment(self, child_attachment: dict) -> None:
+    def add_child_attachment(self, child_attachment: 'ConfluenceAttachmentNode'):
         self.child_attachments.append(child_attachment)
 
-    def set_body(self, body: str) -> None:
+    def set_body(self, body: str):
         self.body = body
         self.macros = self._get_macros_list()
-    
+
     @classmethod
     def from_api_response(cls, response: dict, confluence_type: str) -> 'ConfluencePageNode':
-        page = cls(
+        return cls(
             page_id=str(response['id']),
             page_type=response['type'],
             status=response['status'],
@@ -60,17 +40,11 @@ class ConfluencePageNode:
             edit_link=response['_links']['editui'] if confluence_type == 'cloud' else response['_links']['edit'],
             webui_link=response['_links']['webui']
         )
-        return page
-    
-    @classmethod
-    def from_api_responses(cls, responses: List[dict], confluence_type: str) -> List['ConfluencePageNode']:
-        return [cls.from_api_response(response, confluence_type) for response in responses]
-    
+
     def _get_macros_list(self) -> List[str]:
         if not self.body:
             return []
-        pattern = r'ac:name=\"(.*?)\"'
-        return re.findall(pattern, self.body)
+        return re.findall(r'ac:name="(.*?)"', self.body)
 
     def update_macros(self)->str:
         if self.body is None:

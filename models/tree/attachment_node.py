@@ -1,19 +1,8 @@
-from . import logger
-from typing import Optional
+# No imports needed
 
 class ConfluenceAttachmentNode:
-    def __init__(
-        self,
-        id: str,
-        type: str,
-        status: str,
-        title: str,
-        mediatype: str,
-        file_size: int = 0,
-        media_type_description: str = "",
-        download_link: str = "",
-        webui_link: str = ""
-    ):
+    def __init__(self, id: str, type: str, status: str, title: str, mediatype: str, file_size: int = 0,
+                 media_type_description: str = "", download_link: str = "", webui_link: str = ""):
         self.id = id
         self.type = type
         self.status = status
@@ -23,12 +12,6 @@ class ConfluenceAttachmentNode:
         self.media_type_description = media_type_description
         self.download_link = download_link
         self.webui_link = webui_link
-
-    def __str__(self) -> str:
-        return f"ConfluenceAttachment(id={self.id}, title={self.title})"
-
-    def __repr__(self) -> str:
-        return self.__str__()
 
     @classmethod
     def from_api_response(cls, response: dict) -> 'ConfluenceAttachmentNode':
@@ -43,3 +26,6 @@ class ConfluenceAttachmentNode:
             download_link=response['_links'].get('download', ''),
             webui_link=response['_links'].get('webui', ''),
         )
+
+    def __str__(self) -> str:
+        return f

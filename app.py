@@ -9,10 +9,7 @@ from models.gui.sections.settings_form import SettingsForm
 from models.tree.tree import ConfluencePagesTree
 from models.tree.page_node import ConfluencePageNode
 from models.tree.attachment_node import ConfluenceAttachmentNode
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox
-import requests
-import json
+from tkinter import ttk
 import threading
 import time
 logger = Logger()
@@ -89,6 +86,7 @@ class ConfluenceSpacesApp:
 
     def fetch_source_tree(self):
         self.update_source_instance()
+        self.source_tree = ConfluencePagesTree(self.source_api_client.get_content(self.source_instance.root_page_id), self.source_api_client)  # Initialize source_tree here
         self._fetch_tree(self.source_instance, self.source_api_client, self.source_tree, self.source_stats)
         self.actions_section.update_button_state("save", "readonly", "normal")
         self.actions_section.update_button_state("create_pages", "readonly", "normal")
