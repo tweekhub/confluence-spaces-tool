@@ -7,7 +7,7 @@ on:
       - main
 env:
   RELEASE_TAG: "0.1.0"
-  APP_NAME: "spaces_tool"
+  
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -18,23 +18,23 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         include:
           - os: ubuntu-latest
-            build_name: "$APP_NAME_linux"
+            build_name: "spaces_tool_linux"
             install_extra: sudo apt-get install -y python3-tk
             build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-linux64.zip"
             chromedriver_filename: "chromedriver-linux64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chrome-linux64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chromedriver-linux64.zip"
-            release_file: dist/$APP_NAME_linux
+            release_file: dist/spaces_tool_linux
           - os: windows-latest
             architecture: "x64"
-            build_name: "$APP_NAME_windows_64"
+            build_name: "spaces_tool_windows_64"
             build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-win64.zip"
             chromedriver_filename: "chromedriver-win64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chromedriver-win64.zip"
-            release_file: dist/$APP_NAME_windows_64.exe
+            release_file: dist/spaces_tool_windows_64.exe
 
     steps:
       - name: Checkout code
@@ -106,6 +106,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: $RELEASE_TAG
+          tag_name: ${{ env.RELEASE_TAG }}
           token: ${{ secrets.RELEASE_TOKEN }}
           files: ${{ matrix.release_file }}

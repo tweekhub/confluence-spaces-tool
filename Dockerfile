@@ -18,12 +18,12 @@ RUN apk update && apk add --no-cache \
     build-base \
     chromium \
     libffi-dev \
+    shadow \
     tcl \
     tk \
     ttf-dejavu \
     wget \
     xvfb \
-    shadow \
     && apk add --no-cache --virtual .build-deps gcc musl-dev python3-tkinter \
     && pip install --upgrade pip
 

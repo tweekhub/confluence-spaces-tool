@@ -217,54 +217,61 @@ class ConfluenceSpacesApp:
         def copy_logic():
             browser = ConfluenceBrowserClient()
             browser.initialize_driver()
-            browser.open_page_in_same_tab(self.source_instance.site_url + self.source_instance.home_path)
-            browser.set_credentials(self.source_instance.credentials.email, self.source_instance.credentials.password, self.source_instance.credentials.mfa_secret_key)
-            browser.process_elements_chain(self.app_config.get_elements_list(self.source_instance.confluence_type, 'login_page'))
-
-            browser.open_new_tab(self.target_instance.site_url + self.target_instance.home_path)
-            browser.set_credentials(self.target_instance.credentials.email, self.target_instance.credentials.password, self.target_instance.credentials.mfa_secret_key)
-            browser.process_elements_chain(self.app_config.get_elements_list(self.target_instance.confluence_type, 'login_page'))
+            self._login_to_instances(browser)
 
             self.target_tree.rearrange_trees(self.source_tree.root)
             for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
-                if edit_mode:
-                    if not self.source_api_client.get_page_restrictions(source_node.id):
-                        logger.warning(f"Page '{source_node.title}' is not editable, skipping.")
-                        continue
+                if edit_mode and not self._is_page_editable(source_node):
+                    continue
 
                 if source_node.title == new_node.title:
-                    logger.debug(f"Title matches: {source_node.title}")
-                    source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id) if edit_mode else \
-                        f"{self.source_instance.site_url}{self.app_config.get_endpoint(self.source_instance.confluence_type, 'source', 'view')}?pageId={source_node.id}"
-                    browser.perform_copy_paste(
-                        source={
-                            'tab_index': 0,
-                            'url': source_url,
-                            'element_selector_value': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'content').selector_value,
-                            'element_selector_type': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'content').selector_type,
-                            'discard_selector_value': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'discard_button').selector_value,
-                            'discard_selector_type': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'discard_button').selector_type,
-                        },
-                        target={
-                            'tab_index': 1,
-                            'url': self._get_edit_url(self.target_instance.confluence_type, self.target_instance.site_url, new_node.edit_link, self.target_instance.space_key, new_node.id),
-                            'element_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'content').selector_value,
-                            'element_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'content').selector_type,
-                            'save_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'save_button').selector_value,
-                            'save_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'save_button').selector_type,
-                            'page_width_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'page_width_button').selector_value,
-                            'page_width_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'page_width_button').selector_type,
-                        },
-                        edit_mode=edit_mode
-                    )
-                    # Start a thread to wait for body update
-                    # update_thread = threading.Thread(target=self.wait_for_body_update, args=(new_node,))
-                    # update_thread.start()
+                    self._perform_copy_paste(browser, source_node, new_node, edit_mode)
                     self.total_pages_copied += 1
                 else:
                     logger.warning(f"Warning: Titles do not match. Original: '{source_node.title}', Target: '{new_node.title}'")
             browser.close_driver()
         return self.execute_with_stats_update(copy_logic, **kwargs)
+
+    def _login_to_instances(self, browser):
+        browser.open_page_in_same_tab(self.source_instance.site_url + self.source_instance.home_path)
+        browser.set_credentials(self.source_instance.credentials.email, self.source_instance.credentials.password, self.source_instance.credentials.mfa_secret_key)
+        browser.process_elements_chain(self.app_config.get_elements_list(self.source_instance.confluence_type, 'login_page'))
+
+        browser.open_new_tab(self.target_instance.site_url + self.target_instance.home_path)
+        browser.set_credentials(self.target_instance.credentials.email, self.target_instance.credentials.password, self.target_instance.credentials.mfa_secret_key)
+        browser.process_elements_chain(self.app_config.get_elements_list(self.target_instance.confluence_type, 'login_page'))
+
+    def _is_page_editable(self, source_node):
+        if not self.source_api_client.get_page_restrictions(source_node.id):
+            logger.warning(f"Page '{source_node.title}' is not editable, skipping.")
+            return False
+        return True
+
+    def _perform_copy_paste(self, browser, source_node, new_node, edit_mode):
+        logger.debug(f"Title matches: {source_node.title}")
+        source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id) if edit_mode else \
+            f"{self.source_instance.site_url}{self.app_config.get_endpoint(self.source_instance.confluence_type, 'source', 'view')}?pageId={source_node.id}"
+        browser.perform_copy_paste(
+            source={
+                'tab_index': 0,
+                'url': source_url,
+                'element_selector_value': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'content').selector_value,
+                'element_selector_type': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'content').selector_type,
+                'discard_selector_value': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'discard_button').selector_value,
+                'discard_selector_type': self.app_config.get_element(self.source_instance.confluence_type, 'edit_page', 'discard_button').selector_type,
+            },
+            target={
+                'tab_index': 1,
+                'url': self._get_edit_url(self.target_instance.confluence_type, self.target_instance.site_url, new_node.edit_link, self.target_instance.space_key, new_node.id),
+                'element_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'content').selector_value,
+                'element_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'content').selector_type,
+                'save_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'save_button').selector_value,
+                'save_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'save_button').selector_type,
+                'page_width_button_selector_value': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'page_width_button').selector_value,
+                'page_width_button_selector_type': self.app_config.get_element(self.target_instance.confluence_type, 'edit_page', 'page_width_button').selector_type,
+            },
+            edit_mode=edit_mode
+        )
 
     def wait_for_body_update(self, new_node:ConfluencePageNode):
         logger.debug(f"Waiting for body update for page ID: {new_node.id}")
