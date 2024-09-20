@@ -1,19 +1,20 @@
 import os
 import sys
+import platform
 
 block_cipher = None
 
 # Determine platform and architecture
-platform = sys.platform
-architecture = 'x64' if '64' in os.uname().machine else 'x86'
+current_platform = platform.system().lower()
+architecture = 'x64' if sys.maxsize > 2**32 else 'x86'
 
 chrome_portable_path = './chrome_portable'
 chromedriver_path = './chromedriver'
 
 # Set the executable name based on the platform
-if platform.startswith('win'):
-    exe_name = 'spaces_tool_windows'
-elif platform == 'darwin':
+if current_platform.startswith('win'):
+    exe_name = f'spaces_tool_windows_{architecture}'
+elif current_platform == 'darwin':
     exe_name = f'spaces_tool_macos_{architecture}'
 else:
     exe_name = 'spaces_tool_linux'

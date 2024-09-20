@@ -2,6 +2,9 @@ name: Create Release
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 env:
   RELEASE_TAG: "0.1.0"
@@ -14,15 +17,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+        os: [macos-latest, ubuntu-latest, windows-latest]
         include:
           - os: macos-latest
             architecture: "arm64"
             build_name: "spaces_tool_macos_arm64"
-            build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_arm64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" 
+            build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-mac-arm64.zip"
             chromedriver_filename: "chromedriver-mac-arm64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
@@ -30,8 +30,8 @@ jobs:
             release_file: dist/spaces_tool_macos_arm64
           - os: ubuntu-latest
             build_name: "spaces_tool_linux"
-            install_extra: sudo apt-get install python3-tk
-            build_cmd: pipenv run pyinstaller --hidden-import=tkinter --name="spaces_tool_linux" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile linux_app.spec
+            install_extra: sudo apt-get install -y python3-tk
+            build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-linux64.zip"
             chromedriver_filename: "chromedriver-linux64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chrome-linux64.zip"
@@ -40,7 +40,7 @@ jobs:
           - os: windows-latest
             architecture: "x64"
             build_name: "spaces_tool_windows_64"
-            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_64" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" 
+            build_cmd: pipenv run pyinstaller main.spec
             chrome_filename: "chrome-win64.zip"
             chromedriver_filename: "chromedriver-win64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
@@ -49,7 +49,7 @@ jobs:
           # - os: windows-latest
           #   architecture: "x86"
           #   build_name: "spaces_tool_windows_32"
-          #   build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_32" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" 
+          #   build_cmd: pipenv run pyinstaller main.spec
           #   chrome_filename: "chrome-win32.zip"
           #   chromedriver_filename: "chromedriver-win32.zip"
           #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chrome-win32.zip"
@@ -60,7 +60,7 @@ jobs:
           #   build_name: "spaces_tool_macos_x64"
           #   chrome_filename: "chrome-mac-x64.zip"
           #   chromedriver_filename: "chromedriver-mac-x64.zip"
-          #   build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_x64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
+          #   build_cmd: pipenv run pyinstaller main.spec
           #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chrome-mac-x64.zip"
           #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chromedriver-mac-x64.zip"
           #   release_file: dist/spaces_tool_macos_x64
@@ -91,7 +91,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
 
       - name: Install pipenv dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
@@ -103,7 +103,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: chrome_portable
-          key: chrome-${{ runner.os }}-${{ hashFiles('${{ matrix.chrome_url }}') }}
+          key: chrome-${{ runner.os }}-${{ hashFiles(matrix.chrome_url) }}
 
       - name: Download Chrome Portable
         if: steps.cache-chrome.outputs.cache-hit != 'true'
@@ -116,7 +116,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: chromedriver
-          key: chromedriver-${{ runner.os }}-${{ hashFiles('${{ matrix.chromedriver_url }}') }}
+          key: chromedriver-${{ runner.os }}-${{ hashFiles(matrix.chromedriver_url) }}
 
       - name: Download ChromeDriver
         if: steps.cache-chromedriver.outputs.cache-hit != 'true'
