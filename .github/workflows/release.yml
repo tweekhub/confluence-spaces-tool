@@ -32,7 +32,7 @@ jobs:
             chromedriver_filename: "chromedriver-win64.zip"
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chromedriver-win64.zip"
-            release_file: dist\spaces_tool_windows_64.exe
+            release_file: .\dist\spaces_tool_windows_64.exe
 
     steps:
       - name: Checkout code
