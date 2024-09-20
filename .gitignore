@@ -7,7 +7,7 @@ tests/
 tree_*.txt
 downloads/
 __pycache__/ 
-
+browsers/
 downloads_attachments/
 # Python related paths to ignore
 *.pyc
