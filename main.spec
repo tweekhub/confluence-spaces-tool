@@ -37,9 +37,9 @@ a = Analysis(
         (os.path.join(chrome_portable_path, 'chrome'), 'chrome')
     ],
     datas=[
-        ('confluence-api.json', '.'),
-        ('confluence-elements.json', '.'),
-        ('configuration.yaml', '.'),
+        ('confluence-spaces-tool/confluence-api.json', '.'),
+        ('confluence-spaces-tool/confluence-elements.json', '.'),
+        ('confluence-spaces-tool/configuration.yaml', '.'),
         (chrome_portable_path, 'chrome_portable')
     ],
     hiddenimports=collect_submodules('tkinter'),  # Ensure tkinter is bundled
