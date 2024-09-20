@@ -103,7 +103,10 @@ class ConfluencePageNode:
         # Use available width and height values
         width = ac_original_width if ac_original_width else ac_width
         height = ac_original_height if ac_original_height else ac_height
-
+        if not width:
+            width = 350
+        if not height:
+            height = 350
         # Extract the filename from the URL (everything after the last '/')
         filename = ac_src.split('/')[-1].split('?')[0]
         # Replacement string with the extracted filename, width, and height

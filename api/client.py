@@ -121,11 +121,11 @@ class ConfluenceAPIClient:
                 download_attachment=(category == 'attachment' and action == 'download')
             )
             if action != "export":
-                logger.debug(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:150]}...")
+                logger.debug(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text}...")
         else:
             self.update_request_stats(is_successful=False)
             if action != "export":
-                logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:250]}...")
+                logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text}...")
 
 
     def get_space_id(self, space_key) -> dict:
@@ -160,9 +160,12 @@ class ConfluenceAPIClient:
         return self.api_request('GET', 'content', 'get', self.use_v2_for_cloud, path_params={'contentId': content_id}).json().get("version",{}).get("number","")
 
     def update_content(self, content_id, content_title, body_data, confluence_type):
+        headers = {
+            "Content-Type": "application/json"
+        }
         body_field = {
-            "value": body_data,
-            "representation": "storage"
+            "representation": "storage",
+            "value": body_data
         }
         increment_version = self.get_content_version(content_id) + 1
         payload = {
@@ -174,8 +177,20 @@ class ConfluenceAPIClient:
             },
             "body": body_field if confluence_type == 'cloud' else {"storage": body_field}
         }
-        return self.api_request('PUT', 'content', 'update', self.use_v2_for_cloud, path_params={'contentId': content_id}, data=payload)
+        self.session.headers.update(headers)
+        logger.info(f"Session Headers: {self.session.headers}\n\n\n{payload}\n\n\n")
+        response = self.api_request('PUT', 'content', 'update', self.use_v2_for_cloud, path_params={'contentId': content_id}, json=payload, timeout=120)
+        self.session.headers.pop("Content-Type","")
+        logger.info(f"Session Headers: {self.session.headers}\n")
+        return response
  
+    def validate_xhtml(self, body_data):
+        try:
+            from lxml import etree
+            etree.fromstring(body_data)  # This will raise an error if invalid
+            return True
+        except etree.XMLSyntaxError:
+            return False
     def get_labels(self, content_id):
         return self.api_request('GET', 'label', 'get', 'v1', path_params={'contentId': content_id}).json()['results']
     

@@ -37,10 +37,10 @@ RUN sed -i 's/sudo //g' /app/scripts/install_browser.sh && \
     /app/scripts/install_browser.sh && \
     pip install -r requirements.txt && \
     useradd -m -s /bin/bash "$USER"  && \
-    chown -R $USER:$USER /app
+    chown -R "$USER":"$USER" /app
 
 # Switch to the non-root user
-USER $USER
+USER "$USER"
 
 # Set DISPLAY environment variable
 ENV DISPLAY=:99
