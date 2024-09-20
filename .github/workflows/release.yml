@@ -19,15 +19,15 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         include:
-          - os: macos-latest
-            architecture: "arm64"
-            build_name: "spaces_tool_macos_arm64"
-            build_cmd: pipenv run pyinstaller main.spec
-            chrome_filename: "chrome-mac-arm64.zip"
-            chromedriver_filename: "chromedriver-mac-arm64.zip"
-            chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
-            chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chromedriver-mac-arm64.zip"
-            release_file: dist/spaces_tool_macos_arm64
+          # - os: macos-latest
+          #   architecture: "arm64"
+          #   build_name: "spaces_tool_macos_arm64"
+          #   build_cmd: pipenv run pyinstaller main.spec
+          #   chrome_filename: "chrome-mac-arm64.zip"
+          #   chromedriver_filename: "chromedriver-mac-arm64.zip"
+          #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
+          #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chromedriver-mac-arm64.zip"
+          #   release_file: dist/spaces_tool_macos_arm64
           - os: ubuntu-latest
             build_name: "spaces_tool_linux"
             install_extra: sudo apt-get install -y python3-tk
