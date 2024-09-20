@@ -45,6 +45,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "1.0"
+          token: ${{ secrets.RELEASE_TOKEN }}
           files: |
             dist/spaces_tool_windows.exe
 
