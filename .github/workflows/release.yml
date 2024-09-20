@@ -5,7 +5,7 @@ on:
 
 env:
   RELEASE_TAG: "0.1.0"
-  APP_NAME: "spaces_tool"  # Define the app name once
+  APP_NAME: "spaces_tool"
 
 jobs:
   build:
