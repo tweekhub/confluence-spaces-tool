@@ -6,10 +6,6 @@ on:
     branches:
       - main
 
-env:
-  RELEASE_TAG: "0.1.0"
-  APP_NAME: "spaces_tool"
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -37,7 +33,9 @@ jobs:
             chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
             chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chromedriver-win64.zip"
             release_file: dist/${{ env.APP_NAME }}_windows_64.exe
-
+    env:
+      RELEASE_TAG: "0.1.0"
+      APP_NAME: "spaces_tool"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
