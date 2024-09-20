@@ -2,85 +2,125 @@ name: Create Release
 
 on:
   workflow_dispatch:
-  # pull_request:
-  #   branches: [ main ]
-  # release:
-  #   types: [published, prereleased]
 
 env:
   RELEASE_TAG: "0.1.0"
+  APP_NAME: "spaces_tool"
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    timeout-minutes: 20
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         include:
+          # - os: macos-latest
+          #   architecture: "x64"
+          #   build_name: "spaces_tool_macos_x64"
+          #   build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_x64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
+          #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chrome-mac-x64.zip"
+          #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-x64/chromedriver-mac-x64.zip"
+          #   release_file: dist/spaces_tool_macos_x64
           - os: macos-latest
-            build_name: spaces_tool_macos
-            build_cmd: pipenv run pyinstaller --name "spaces_tool_macos" --onefile main.spec
-            chrome_url: "https://path_to_chrome_portable_for_macos.zip"
-            chromedriver_url: "https://path_to_chromedriver_for_macos.zip"
-            release_file: dist/spaces_tool_macos
+            architecture: "arm64"
+            build_name: "spaces_tool_macos_arm64"
+            build_cmd: pipenv run pyinstaller --name "spaces_tool_macos_arm64" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile main.spec
+            chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chrome-mac-arm64.zip"
+            chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/mac-arm64/chromedriver-mac-arm64.zip"
+            release_file: dist/spaces_tool_macos_arm64
           - os: ubuntu-latest
-            build_name: spaces_tool_linux
+            build_name: "spaces_tool_linux"
             install_extra: sudo apt-get install python3-tk
-            build_cmd: pipenv run pyinstaller --hidden-import=tkinter --name="spaces_tool_linux" --onefile linux_app.spec
-            chrome_url: "https://path_to_chrome_portable_for_linux.tar.gz"
-            chromedriver_url: "https://path_to_chromedriver_for_linux.zip"
+            build_cmd: pipenv run pyinstaller --hidden-import=tkinter --name="spaces_tool_linux" --add-data "chrome_portable/*:chrome_portable" --add-data "chromedriver/*:chromedriver" --onefile linux_app.spec
+            chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chrome-linux64.zip"
+            chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/linux64/chromedriver-linux64.zip"
             release_file: dist/spaces_tool_linux
           - os: windows-latest
-            build_name: spaces_tool_windows
-            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows" --onefile main.spec
-            chrome_url: "https://path_to_chrome_portable_for_windows.zip"
-            chromedriver_url: "https://path_to_chromedriver_for_windows.zip"
-            release_file: dist/spaces_tool_windows.exe
+            architecture: "x64"
+            build_name: "spaces_tool_windows_64"
+            build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_64" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
+            chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chrome-win64.zip"
+            chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win64/chromedriver-win64.zip"
+            release_file: dist/spaces_tool_windows_64.exe
+          # - os: windows-latest
+          #   architecture: "x86"
+          #   build_name: "spaces_tool_windows_32"
+          #   build_cmd: pipenv run pyinstaller --icon=icon.ico --windowed --name="spaces_tool_windows_32" --add-data "chrome_portable/*;chrome_portable" --add-data "chromedriver/*;chromedriver" --onefile main.spec
+          #   chrome_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chrome-win32.zip"
+          #   chromedriver_url: "https://storage.googleapis.com/chrome-for-testing-public/131.0.6724.0/win32/chromedriver-win32.zip"
+          #   release_file: dist/spaces_tool_windows_32.exe
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
 
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pipenv wheel
-        if: matrix.os == 'ubuntu-latest'
+    - name: Install pipenv
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          sudo apt-get install -y pipenv
+        elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          brew install pipenv
+        elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          pip install pipenv
+        fi
 
-      - name: Install additional dependencies (if any)
-        run: ${{ matrix.install_extra || 'echo "No extra dependencies"' }}
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pipenv wheel
+      if: matrix.os == 'ubuntu-latest'
 
-      - id: cache-pipenv
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+    - name: Install additional dependencies (if any)
+      run: ${{ matrix.install_extra || 'echo "No extra dependencies"' }}
 
-      - name: Install pipenv dependencies
-        if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: |
-          pipenv install --deploy --dev
+    - id: cache-pipenv
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/share/virtualenvs
+        key: ${{ runner.os }}${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
 
-      - name: Download Chrome Portable
-        run: |
-          curl -L ${{ matrix.chrome_url }} -o chrome_portable.zip
-          unzip chrome_portable.zip -d chrome_portable
+    - name: Install pipenv dependencies
+      if: steps.cache-pipenv.outputs.cache-hit != 'true'
+      run: |
+        pipenv install --deploy --dev
 
-      - name: Download ChromeDriver
-        run: |
-          curl -L ${{ matrix.chromedriver_url }} -o chromedriver.zip
-          unzip chromedriver.zip -d chromedriver
+    - name: Cache Chrome Portable
+      id: cache-chrome
+      uses: actions/cache@v4
+      with:
+        path: chrome_portable
+        key: chrome-${{ runner.os }}-${{ hashFiles('${{ matrix.chrome_url }}') }}
 
-      - name: Build executable
-        run: ${{ matrix.build_cmd }}
+    - name: Download Chrome Portable
+      if: steps.cache-chrome.outputs.cache-hit != 'true'
+      run: |
+        curl -L ${{ matrix.chrome_url }} -o chrome_portable.zip
+        unzip chrome_portable.zip -d chrome_portable
 
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          token: ${{ secrets.RELEASE_TOKEN }}
-          files: ${{ matrix.release_file }}
+    - name: Cache ChromeDriver
+      id: cache-chromedriver
+      uses: actions/cache@v4
+      with:
+        path: chromedriver
+        key: chromedriver-${{ runner.os }}-${{ hashFiles('${{ matrix.chromedriver_url }}') }}
+
+    - name: Download ChromeDriver
+      if: steps.cache-chromedriver.outputs.cache-hit != 'true'
+      run: |
+        curl -L ${{ matrix.chromedriver_url }} -o chromedriver.zip
+        unzip chromedriver.zip -d chromedriver
+
+    - name: Build executable
+      run: ${{ matrix.build_cmd }}
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        token: ${{ secrets.RELEASE_TOKEN }}
+        files: ${{ matrix.release_file }}

@@ -1,15 +1,31 @@
-# -*- mode: python ; coding: utf-8 -*-
+import os
+import sys
 
 block_cipher = None
 
-chrome_portable_path = './path_to_chrome_portable'
-chromedriver_path = './path_to_chromedriver'
+# Determine platform and architecture
+platform = sys.platform
+architecture = 'x64' if '64' in os.uname().machine else 'x86'
+
+chrome_portable_path = './chrome_portable'
+chromedriver_path = './chromedriver'
+
+# Set the executable name based on the platform
+if platform.startswith('win'):
+    exe_name = 'spaces_tool_windows'
+elif platform == 'darwin':
+    exe_name = f'spaces_tool_macos_{architecture}'
+else:
+    exe_name = 'spaces_tool_linux'
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[(chrome_portable_path, 'chrome_portable'), (chromedriver_path, 'chromedriver')],
+    datas=[
+        (chrome_portable_path, 'chrome_portable'),
+        (chromedriver_path, 'chromedriver')
+    ],
     hiddenimports=['tkinter'],
     hookspath=[],
     hooksconfig={},
@@ -30,7 +46,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='main',
+    name=exe_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

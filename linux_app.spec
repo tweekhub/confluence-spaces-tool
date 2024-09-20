@@ -2,14 +2,17 @@
 
 block_cipher = None
 
-chrome_portable_path = './path_to_chrome_portable'
-chromedriver_path = './path_to_chromedriver'
+chrome_portable_path = './chrome_portable'
+chromedriver_path = './chromedriver'
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[(chrome_portable_path, 'chrome_portable'), (chromedriver_path, 'chromedriver')],
+    datas=[
+        (chrome_portable_path, 'chrome_portable'),
+        (chromedriver_path, 'chromedriver')
+    ],
     hiddenimports=['tkinter'],
     hookspath=[],
     hooksconfig={},
@@ -42,7 +45,7 @@ exe = EXE(
     splash,
     splash.binaries,
     [],
-    name='app_linux',
+    name='spaces_tool_linux',  # Adjusted for Linux
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
