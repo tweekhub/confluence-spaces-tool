@@ -37,27 +37,27 @@ class ConfluenceBrowserClient:
         
         # Determine platform and architecture
         current_platform = platform.system().lower()
-        architecture = platform.machine().lower()
+        architecture = 'x64' if sys.maxsize > 2**32 else 'x86'
 
-        # Determine if running in PyInstaller bundled mode
-        base_path = sys._MEIPASS if getattr(sys, 'frozen', False) else os.getcwd()
-
-        # Set Chrome binary and ChromeDriver paths based on platform and architecture
+        # Set the executable name based on the platform and architecture
         if current_platform.startswith('win'):
-            chrome_binary_name = 'chrome.exe'
+            chrome_portable_path = './chrome_portable/chrome-win64/'
+            chromedriver_path = './chromedriver/chromedriver-win64/'
         elif current_platform == 'darwin':
-            # macOS (both x64 and arm64)
-            if architecture == 'arm64':
-                chrome_binary_name = 'chrome-arm64'
-            else:
-                chrome_binary_name = 'chrome'
+            chrome_portable_path = './chrome_portable/chrome-mac-x64/'
+            chromedriver_path = './chromedriver/chromedriver-mac-x64/'
         else:
-            # Linux and other Unix-like systems
-            chrome_binary_name = 'chrome'
+            chrome_portable_path = './chrome_portable/chrome-linux64/'
+            chromedriver_path = './chromedriver/chromedriver-linux64/'
+
+        # If running inside a PyInstaller bundle, adjust the paths accordingly
+        if getattr(sys, 'frozen', False):
+            chrome_portable_path = os.path.join(sys._MEIPASS, 'chrome_portable')
+            chromedriver_path = os.path.join(sys._MEIPASS, 'chromedriver')
 
         # Construct paths for Chrome binary and ChromeDriver
-        chrome_binary_path = os.path.join(base_path, 'chrome_portable', chrome_binary_name)
-        chrome_driver_path = os.path.join(base_path, 'chrome_driver')
+        chrome_binary_path = os.path.join(chrome_portable_path, 'chrome')
+        chrome_driver_path = os.path.join(chromedriver_path, 'chromedriver')
 
         try:
             # For bundled mode

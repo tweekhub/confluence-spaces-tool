@@ -12,16 +12,16 @@ architecture = 'x64' if sys.maxsize > 2**32 else 'x86'
 # Set the executable name based on the platform and architecture
 if current_platform.startswith('win'):
     exe_name = f'spaces_tool_windows_{architecture}'
-    chrome_portable_path = './chrome_portable/'
-    chromedriver_path = './chromedriver/'
+    chrome_portable_path = './chrome_portable/chrome-win64/'
+    chromedriver_path = './chromedriver/chromedriver-win64/'
 elif current_platform == 'darwin':
     exe_name = f'spaces_tool_macos_{architecture}'
-    chrome_portable_path = './chrome_portable/'
-    chromedriver_path = './chromedriver/'
+    chrome_portable_path = './chrome_portable/chrome-mac-x64/'
+    chromedriver_path = './chromedriver/chromedriver-mac-x64/'
 else:
     exe_name = 'spaces_tool_linux'
-    chrome_portable_path = './chrome_portable/'
-    chromedriver_path = './chromedriver/'
+    chrome_portable_path = './chrome_portable/chrome-linux64/'
+    chromedriver_path = './chromedriver/chromedriver-linux64/'
 
 # If running inside a PyInstaller bundle, adjust the paths accordingly
 if getattr(sys, 'frozen', False):
