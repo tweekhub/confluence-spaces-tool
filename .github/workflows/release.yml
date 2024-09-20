@@ -2,9 +2,7 @@ name: Create Release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  
 env:
   RELEASE_TAG: "0.1.0"
   
