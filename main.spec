@@ -14,14 +14,20 @@ if current_platform.startswith('win'):
     exe_name = f'spaces_tool_windows_{architecture}'
     chrome_portable_path = './chrome_portable/chrome-win64/'
     chromedriver_path = './chromedriver/chromedriver-win64/'
+    chromedriver_binary = 'chromedriver.exe'
+    chrome_binary = 'chrome.exe'
 elif current_platform == 'darwin':
     exe_name = f'spaces_tool_macos_{architecture}'
     chrome_portable_path = './chrome_portable/chrome-mac-x64/'
     chromedriver_path = './chromedriver/chromedriver-mac-x64/'
+    chromedriver_binary = 'chromedriver'
+    chrome_binary = 'chrome'
 else:
     exe_name = 'spaces_tool_linux'
     chrome_portable_path = './chrome_portable/chrome-linux64/'
     chromedriver_path = './chromedriver/chromedriver-linux64/'
+    chromedriver_binary = 'chromedriver'
+    chrome_binary = 'chrome'
 
 # If running inside a PyInstaller bundle, adjust the paths accordingly
 if getattr(sys, 'frozen', False):
@@ -33,8 +39,8 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[
-        (os.path.join(chromedriver_path, 'chromedriver'), 'chromedriver'),
-        (os.path.join(chrome_portable_path, 'chrome'), 'chrome')
+        (os.path.join(chromedriver_path, chromedriver_binary), 'chromedriver'),
+        (os.path.join(chrome_portable_path, chrome_binary), 'chrome')
     ],
     datas=[
         ('confluence-api.json', '.'),

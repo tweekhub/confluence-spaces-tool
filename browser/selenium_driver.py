@@ -43,12 +43,18 @@ class ConfluenceBrowserClient:
         if current_platform.startswith('win'):
             chrome_portable_path = './chrome_portable/chrome-win64/'
             chromedriver_path = './chromedriver/chromedriver-win64/'
+            chrome_binary = 'chrome.exe'
+            chromedriver_binary = 'chromedriver.exe'
         elif current_platform == 'darwin':
             chrome_portable_path = './chrome_portable/chrome-mac-x64/'
             chromedriver_path = './chromedriver/chromedriver-mac-x64/'
+            chrome_binary = 'chrome'
+            chromedriver_binary = 'chromedriver'
         else:
             chrome_portable_path = './chrome_portable/chrome-linux64/'
             chromedriver_path = './chromedriver/chromedriver-linux64/'
+            chrome_binary = 'chrome'
+            chromedriver_binary = 'chromedriver'
 
         # If running inside a PyInstaller bundle, adjust the paths accordingly
         if getattr(sys, 'frozen', False):
@@ -56,8 +62,8 @@ class ConfluenceBrowserClient:
             chromedriver_path = os.path.join(sys._MEIPASS, 'chromedriver')
 
         # Construct paths for Chrome binary and ChromeDriver
-        chrome_binary_path = os.path.join(chrome_portable_path, 'chrome')
-        chrome_driver_path = os.path.join(chromedriver_path, 'chromedriver')
+        chrome_binary_path = os.path.join(chrome_portable_path, chrome_binary)
+        chrome_driver_path = os.path.join(chromedriver_path, chromedriver_binary)
 
         try:
             # For bundled mode
