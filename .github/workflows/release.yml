@@ -68,7 +68,6 @@ jobs:
         run: |
           pipenv install --deploy --dev
 
-      # Cache Chrome Portable
       - name: Cache Chrome Portable
         id: cache-chrome
         uses: actions/cache@v4
@@ -76,14 +75,12 @@ jobs:
           path: chrome_portable/**
           key: chrome-${{ runner.os }}-${{ hashFiles(matrix.chrome_url) }}
 
-      # Download Chrome Portable
       - name: Download Chrome Portable
         if: steps.cache-chrome.outputs.cache-hit != 'true'
         run: |
           curl -L ${{ matrix.chrome_url }} -o chrome_portable.zip
           unzip chrome_portable.zip -d chrome_portable
 
-      # Cache ChromeDriver
       - name: Cache ChromeDriver
         id: cache-chromedriver
         uses: actions/cache@v4
@@ -91,7 +88,6 @@ jobs:
           path: chromedriver/**
           key: chromedriver-${{ runner.os }}-${{ hashFiles(matrix.chromedriver_url) }}
 
-      # Download ChromeDriver
       - name: Download ChromeDriver
         if: steps.cache-chromedriver.outputs.cache-hit != 'true'
         run: |

@@ -1,7 +1,6 @@
 from . import logger
 import yaml
 from pathlib import Path
-import re
 from config.config_types import UIElement, ConfluenceInstance
 from typing import Dict, Any, List, Optional
 import json
@@ -52,13 +51,13 @@ class ConfluenceConfig:
             except json.JSONDecodeError as e:
                 raise json.JSONDecodeError(f"Error decoding JSON file: {e}")
 
-    def _load_confluence_instance(self, instance_data: dict) -> ConfluenceInstance:
+    def _load_confluence_instance(self, instance_data: dict):
         if not instance_data:
             raise ValueError("Missing Confluence instance data in the configuration.")
         logger.debug(f"Loading Confluence instance: {instance_data['name']}")
         return ConfluenceInstance(config_data=instance_data)
-
-    def find_instance_by_key(self, key: str) -> ConfluenceInstance:
+    
+    def find_instance_by_key(self, key: str):
         valid_keys = ['source', 'target']
         if key not in valid_keys:
             raise ValueError(f"Invalid key '{key}'. Valid keys are: {valid_keys}")
@@ -67,7 +66,7 @@ class ConfluenceConfig:
             raise ValueError(f"No instance data found for key '{key}' in the configuration.")
         return ConfluenceInstance(config_data=instance_data)
 
-    def get_auth_credentials(self, instance_key: str) -> dict:
+    def get_auth_credentials(self, instance_key: str):
         instance = self.find_instance_by_key(instance_key)
         credentials = instance.credentials
 

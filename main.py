@@ -5,9 +5,9 @@ import argparse
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Confluence Spaces Tool")
-    parser.add_argument("--config-file", default="./configuration.yaml", help="Specify the path to the configuration file")
-    parser.add_argument("--api-config-file", default="./confluence-api.json", help="Specify the path to the API configuration file")
-    parser.add_argument("--browser-config-file", default="./confluence-elements.json", help="Specify the path to the UI elements configuration file")
+    parser.add_argument("--config-file", default="configuration.yaml", help="Specify the path to the configuration file")
+    parser.add_argument("--api-config-file", default="confluence-api.json", help="Specify the path to the API configuration file")
+    parser.add_argument("--browser-config-file", default="confluence-elements.json", help="Specify the path to the UI elements configuration file")
     parser.add_argument("--download-dir", default="downloads", type=str, help="Specify the directory to download files")
 
     parser.add_argument("--log-level", default="info", choices=["debug", "info", "warning", "error"], help="Set the logging levels")
