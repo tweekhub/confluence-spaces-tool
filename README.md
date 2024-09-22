@@ -10,6 +10,9 @@
 ## Preface
 The Confluence Spaces Tool is a powerful utility designed to automate the copying of spaces between different Confluence instances. It supports both Confluence Server and Cloud versions and can perform various tasks such as fetching, creating, and updating pages, managing attachments, and synchronizing content between Confluence spaces. This tool is particularly useful for teams aiming to streamline documentation processes or migrate content between instances.
 
+![image](https://github.com/user-attachments/assets/a787f681-5671-4fc8-b93c-74a20bd5051a)
+
+
 ### Key Functionalities:
 - Build a hierarchical structure of pages, including details like page ID, title, labels, attachments, and child page IDs. The root page of this structure will be determined by an ID provided via the GUI settings or the `config.yaml` file.
 - Retrieve and store the names of macros used in the source pages.
