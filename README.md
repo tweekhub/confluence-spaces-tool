@@ -10,7 +10,7 @@
 ## Preface
 The Confluence Spaces Tool is a powerful utility designed to automate the copying of spaces between different Confluence instances. It supports both Confluence Server and Cloud versions and can perform various tasks such as fetching, creating, and updating pages, managing attachments, and synchronizing content between Confluence spaces. This tool is particularly useful for teams aiming to streamline documentation processes or migrate content between instances.
 
-Download for [Windows x64](https://github.com/atonomic/confluence-spaces-tool/releases/download/v0.1.0/spaces_tool_windows_x64.exe) or for [Debian like Linux x64](https://github.com/atonomic/confluence-spaces-tool/releases/download/v0.1.0/spaces_tool_linux_x64.exe)
+Download for [Windows x64](https://github.com/atonomic/confluence-spaces-tool/releases/download/v1.0.0/spaces_tool_windows_x64.exe) or for [Debian like Linux x64](https://github.com/atonomic/confluence-spaces-tool/releases/download/v1.0.0/spaces_tool_linux_x64.exe)
 
 ![{038940FB-4201-448F-BF6D-4C723A330FC7}](https://github.com/user-attachments/assets/b8dbd9c1-6973-4149-a2da-366fed193037)
 

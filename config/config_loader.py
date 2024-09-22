@@ -133,10 +133,17 @@ class ConfluenceConfig:
 
         self.config_data = self._merge_dicts(self.config_data, updated_config)
         
-        with open(self.config_file, 'w') as file:
+        if getattr(sys, 'frozen', False):
+            # If the application is run as a bundle, use the sys._MEIPASS path
+            config_path = os.path.join(sys._MEIPASS, self.config_file, 'configuration.yaml')
+        else:
+            # Otherwise, use the regular file path
+            config_path = self.config_file
+
+        with open(config_path, 'w') as file:
             try:
                 yaml.dump(self.config_data, file, default_flow_style=False, sort_keys=False)
-                logger.debug(f"Configuration successfully updated and written to {self.config_file}")
+                logger.debug(f"Configuration successfully updated and written to {config_path}")
             except yaml.YAMLError as e:
                 raise yaml.YAMLError(f"Error writing updated configuration to YAML file: {e}")
 
