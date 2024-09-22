@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*'
 env:
-  RELEASE_TAG: "0.1.0"
+  RELEASE_TAG: "v0.1.0"
   
 jobs:
   build:
