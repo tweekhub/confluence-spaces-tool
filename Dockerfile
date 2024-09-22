@@ -17,16 +17,14 @@ LABEL version="0.1.0"
 LABEL org.opencontainers.image.licenses=Apache
 
 RUN apk update && apk add --no-cache \
-    bash build-base dbus-x11 libffi-dev py3-pip python3 shadow \
-    tcl tcl-dev tk tk-dev ttf-dejavu wget xfce4 xfce4-terminal \
-    xorg-server xvfb unzip chromium chromium-chromedriver nss \
-    freetype harfbuzz ca-certificates ttf-freefont
-
-RUN mkdir -p /app/chrome/browser && \
+    bash build-base ca-certificates chromium chromium-chromedriver dbus-x11 \
+    freetype harfbuzz libffi-dev nss py3-pip python3 shadow tcl tcl-dev \
+    tk tk-dev ttf-dejavu ttf-freefont unzip wget xfce4 xfce4-terminal \
+    xorg-server xvfb && \
+    mkdir -p /app/chrome/browser && \
     ln -s /usr/bin/chromium-browser /app/chrome/browser/chrome && \
-    ln -s /usr/bin/chromedriver /app/chrome/chromedriver
-
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev && \
+    ln -s /usr/bin/chromedriver /app/chrome/chromedriver && \
+    apk add --no-cache --virtual .build-deps gcc musl-dev && \
     pip install --upgrade pip && \
     pip install pipenv
 

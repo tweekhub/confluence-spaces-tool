@@ -37,7 +37,6 @@ class ConfluenceBrowserClient:
         
         # Determine platform and architecture
         current_platform = platform.system().lower()
-        architecture = 'x64' if sys.maxsize > 2**32 else 'x86'
 
         # Set the executable name based on the platform and architecture
         if current_platform.startswith('win'):

@@ -159,32 +159,6 @@ class ConfluenceAPIClient:
 
     def get_content_version(self,content_id):
         return self.api_request('GET', 'content', 'get', self.use_v2_for_cloud, path_params={'contentId': content_id}).json().get("version",{}).get("number","")
-
-    # TODO: Fix this method
-    def update_content(self, content_id, content_title, body_data, confluence_type):
-        headers = {
-            "Content-Type": "application/json"
-        }
-        body_field = {
-            "representation": "storage",
-            "value": body_data
-        }
-        increment_version = int(self.get_content_version(content_id)) + 1
-        payload = {
-            "id": content_id,
-            "title": content_title,
-            "status": "current",
-            "version": {
-                "number": increment_version
-            },
-            "body": body_field if confluence_type == 'cloud' else {"storage": body_field}
-        }
-        self.session.headers.update(headers)
-        logger.info(f"Session Headers: {self.session.headers}\n\n\n{payload}\n\n\n")
-        response = self.api_request('PUT', 'content', 'update', self.use_v2_for_cloud, path_params={'contentId': content_id}, json=payload, timeout=120)
-        self.session.headers.pop("Content-Type", "")
-        logger.info(f"Session Headers: {self.session.headers}\n")
-        return response
  
     def validate_xhtml(self, body_data):
         try:

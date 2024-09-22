@@ -302,14 +302,6 @@ class ConfluenceSpacesApp:
             edit_mode=edit_mode
         )
 
-    def wait_for_body_update(self, new_node:ConfluencePageNode):
-        logger.debug(f"Waiting for body update for page ID: {new_node.id}")
-        response = self.target_api_client.get_content(new_node.id)
-        new_node.set_body(response.json()['body']['storage']['value'])
-        updated_page = new_node.update_macros()
-        escaped_body_data = updated_page
-        self.target_api_client.update_content(content_id=new_node.id,content_title=new_node.title,body_data=escaped_body_data,confluence_type=self.target_instance.confluence_type)
-
     def copy_attachments(self):
         def copy_logic():
             if self.target_tree == None:

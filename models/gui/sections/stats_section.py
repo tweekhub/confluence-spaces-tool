@@ -87,8 +87,6 @@ class StatsTable:
     def update_stats(self, new_stats):
         for key, value in new_stats.items():
             if key in self.labels:
-                # if key == "root_page_title" and len(value) > 55:
-                #     value = f"{value[:55]}..."
                 self.labels[key].config(text=value)
 
     def update_current_user_groups(self, current_user_groups):
