@@ -11,7 +11,19 @@
 The Confluence Spaces Tool is a powerful utility designed to automate the copying of spaces between different Confluence instances. It supports both Confluence Server and Cloud versions and can perform various tasks such as fetching, creating, and updating pages, managing attachments, and synchronizing content between Confluence spaces. This tool is particularly useful for teams aiming to streamline documentation processes or migrate content between instances.
 
 Download for [Windows x64](https://github.com/atonomic/confluence-spaces-tool/releases/download/v0.1.0/spaces_tool_windows_x64.exe) or for [Debian like Linux x64](https://github.com/atonomic/confluence-spaces-tool/releases/download/v0.1.0/spaces_tool_linux_x64.exe)
+
 ![{038940FB-4201-448F-BF6D-4C723A330FC7}](https://github.com/user-attachments/assets/b8dbd9c1-6973-4149-a2da-366fed193037)
+
+
+or you can also run the gui app via docker
+
+```bash
+   sudo apt install x11-xserver-utils xorg
+   xhost + # allow from anywhere to connect (used in local machine for opening gui from Container)
+
+   docker build -t test-gui . -f Dockerfile
+   docker run -e DISPLAY=$DISPLAY -e CONFIG_FILE=./configuration.yaml -v ./configuration.yaml:/app/configuration.yaml -v ./downloads:/app/downloads -v /tmp/.X11-unix:/tmp/.X11-unix test-gui:latest
+```
 
 ### Key Functionalities:
 - Build a hierarchical structure of pages, including details like page ID, title, labels, attachments, and child page IDs. The root page of this structure will be determined by an ID provided via the GUI settings or the `config.yaml` file.
@@ -148,14 +160,3 @@ Alternatively, You can also setup a developer environment for this tool by follo
    pip3 install -r requirements.txt
    ```
    This installs all the necessary Python libraries for the tool to function.
-
-or you can also run the gui app via docker
-
-```bash
-   sudo apt install x11-xserver-utils xorg
-   # allow from anywhere to connect (used for opening gui from within Container)
-   xhost +
-
-   docker build -t test-gui . -f Dockerfile
-   docker run -e DISPLAY=$DISPLAY -e CONFIG_FILE=./configuration.yaml -v ./configuration.yaml:/app/configuration.yaml -v ./downloads:/app/downloads -v /tmp/.X11-unix:/tmp/.X11-unix test-gui:latest
-```
