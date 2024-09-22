@@ -11,38 +11,37 @@ ENV USER=bot
 LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-spaces-tool
 LABEL org.opencontainers.image.description="A tool to manage your confluence pages across confluence spaces"
 LABEL org.opencontainers.image.licenses=Apache
+LABEL org.opencontainers.image.vendor="Atonomic"
+LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-spaces-tool
+LABEL org.opencontainers.image.url=https://github.com/atonomic/confluence-spaces-tool
+LABEL version="0.1.0"
+LABEL org.opencontainers.image.licenses=Apache
 
-# Install necessary packages
 RUN apk update && apk add --no-cache \
-    bash \
-    build-base \
-    chromium \
-    libffi-dev \
-    shadow \
-    tcl \
-    tk \
-    ttf-dejavu \
-    wget \
-    xvfb \
-    && apk add --no-cache --virtual .build-deps gcc musl-dev python3-tkinter \
-    && pip install --upgrade pip
+    bash build-base dbus-x11 libffi-dev py3-pip python3 shadow \
+    tcl tcl-dev tk tk-dev ttf-dejavu wget xfce4 xfce4-terminal \
+    xorg-server xvfb unzip chromium chromium-chromedriver nss \
+    freetype harfbuzz ca-certificates ttf-freefont
 
-# Copy your Python and config files to the container
-COPY . /app
+RUN mkdir -p /app/chrome/browser && \
+    ln -s /usr/bin/chromium-browser /app/chrome/browser/chrome && \
+    ln -s /usr/bin/chromedriver /app/chrome/chromedriver
+
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev && \
+    pip install --upgrade pip && \
+    pip install pipenv
+
 WORKDIR /app
 
-# Make the install_browser.sh script executable
-RUN sed -i 's/sudo //g' /app/scripts/install_browser.sh && \
-    chmod +x /app/scripts/install_browser.sh && \
-    /app/scripts/install_browser.sh && \
-    pip install -r requirements.txt && \
-    useradd -m -s /bin/bash "$USER"  && \
+COPY ./src /app/src
+COPY ./Pipfile /app/Pipfile
+COPY ./Pipfile.lock /app/Pipfile.lock
+
+RUN adduser -D -s /bin/bash "$USER" && \
     chown -R "$USER":"$USER" /app
 
-# Switch to the non-root user
 USER "$USER"
 
-# Set DISPLAY environment variable
-ENV DISPLAY=:99
+RUN pipenv install --deploy
 
-CMD ["sh", "-c", "mkdir -p /tmp/.X11-unix && chmod 1777 /tmp/.X11-unix && Xvfb :99 -screen 0 1024x768x16 & python3 main.py --config-file $CONFIG_FILE --api-config-file $API_CONFIG_FILE --browser-config-file $BROWSER_CONFIG_FILE --download-dir $DOWNLOAD_DIR --log-level $LOG_LEVEL --log-file $LOG_FILE"]
+ENTRYPOINT ["pipenv", "run", "python", "main.py", "--config-file", "$CONFIG_FILE", "--api-config-file", "$API_CONFIG_FILE", "--browser-config-file", "$BROWSER_CONFIG_FILE", "--download-dir", "$DOWNLOAD_DIR", "--log-level", "$LOG_LEVEL", "--log-file", "$LOG_FILE"]
