@@ -1,0 +1,34 @@
+name: 'Build Container'
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  repo: ghcr.io/atonomic/confluence-spaces-tool
+  context_path: .
+  image: confluence-spaces-tool
+  tag: 0.1.0
+  dockerfile_path: Dockerfile
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    name: build and push image
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: Log in to GitHub Packages
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.PACKAGES_TOKEN }}
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build ${{ env.context_path }} --tag ${{ env.repo }}/${{ env.image }}:${{ env.tag }} -f ${{ env.dockerfile_path }}
+        docker push ${{ env.repo }}/${{ env.image }}:${{ env.tag }}
