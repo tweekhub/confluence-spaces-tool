@@ -12,7 +12,6 @@ LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-spa
 LABEL org.opencontainers.image.description="A tool to manage your confluence pages across confluence spaces"
 LABEL org.opencontainers.image.licenses=Apache
 LABEL org.opencontainers.image.vendor="Atonomic"
-LABEL org.opencontainers.image.source=https://github.com/atonomic/confluence-spaces-tool
 LABEL org.opencontainers.image.url=https://github.com/atonomic/confluence-spaces-tool
 LABEL version="0.1.0"
 LABEL org.opencontainers.image.licenses=Apache
