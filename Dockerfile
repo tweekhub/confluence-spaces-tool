@@ -33,9 +33,7 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev && \
 
 WORKDIR /app
 
-COPY ./src /app/src
-COPY ./Pipfile /app/Pipfile
-COPY ./Pipfile.lock /app/Pipfile.lock
+COPY . /app
 
 RUN adduser -D -s /bin/bash "$USER" && \
     chown -R "$USER":"$USER" /app

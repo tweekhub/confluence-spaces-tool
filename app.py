@@ -60,7 +60,7 @@ class ConfluenceSpacesApp:
         self.actions_section.update_action_command("export","pdf",{"command": lambda: threading.Thread(target=self.download_pdfs).start()})
         self.actions_section.update_action_command("export","word",{"command": lambda: threading.Thread(target=self.download_words).start()})
         self.actions_section.update_action_command("download","attachments",{"command": lambda: threading.Thread(target=self.download_attachments).start()})
-
+        self.is_source_cookies_logged_in = False
         self.total_pages_copied = 0
 
     def update_source_instance(self):
@@ -72,6 +72,7 @@ class ConfluenceSpacesApp:
             self.source_api_client.initialize_session()
         else:
             self._initialize_browser_and_login(self.source_instance, self.source_api_client)
+            self.is_source_cookies_logged_in = True
         self.source_space_id = self.source_api_client.get_space_id(self.source_instance.space_key)
         self.source_stats.update_current_user_groups(self.source_api_client.get_user_groups())
         self.source_stats.update_stats({"space_id": self.source_instance.space_key, "root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id)})
@@ -94,14 +95,13 @@ class ConfluenceSpacesApp:
         self._update_req_stats()
 
     def fetch_source_tree(self):
-        is_cookies = False
         if not self.source_api_client.logged_in:
             logger.info(f"{self.source_instance.name} {self.source_instance.confluence_type}> Logging In {self.source_instance.credentials.rest_auth_type.title()}")
             if self.source_instance.credentials.rest_auth_type != "cookies_auth":
                 self.source_api_client.initialize_session()
             else:
                 self._initialize_browser_and_login(self.source_instance, self.source_api_client)
-                is_cookies = True
+                self.is_source_cookies_logged_in = True
         root_page = self.source_api_client.get_content(self.source_instance.root_page_id)
         root_node = ConfluencePageNode.from_api_response(root_page.json(), self.source_instance.confluence_type)
         self.source_tree = ConfluencePagesTree(root_node, self.source_api_client)
@@ -114,7 +114,7 @@ class ConfluenceSpacesApp:
         self.actions_section.update_button_state("create_pages", "readonly", "normal")
         self.actions_section.update_button_state("copy_pages", "readonly", "normal")
         self.actions_section.update_button_state("download", "readonly", "normal")
-        if is_cookies:
+        if self.is_source_cookies_logged_in:
             self.actions_section.update_button_state("export", "readonly", "normal")
         self._update_req_stats()
 
