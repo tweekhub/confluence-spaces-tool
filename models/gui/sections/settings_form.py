@@ -74,6 +74,16 @@ class SettingsForm:
         self.exclude_ids_entry = ttk.Entry(frame, width=35)
         self.exclude_ids_entry.grid(row=7, column=1, padx=5, pady=5, sticky="w")
         self.exclude_ids_entry.insert(0, ', '.join(map(str, self.config.get('exclude_ids', []))))
+        # Cross-platform binding for "Select All"
+        self.exclude_ids_entry.bind("<Control-a>", self.select_all)
+        self.exclude_ids_entry.bind("<Command-a>", self.select_all)  # For macOS
+
+        # Standard copy-paste bindings
+        self.exclude_ids_entry.bind("<Control-c>", lambda event: self.exclude_ids_entry.event_generate('<<Copy>>'))
+        self.exclude_ids_entry.bind("<Command-c>", lambda event: self.exclude_ids_entry.event_generate('<<Copy>>'))  # For macOS
+
+        self.exclude_ids_entry.bind("<Control-v>", lambda event: self.exclude_ids_entry.event_generate('<<Paste>>'))
+        self.exclude_ids_entry.bind("<Command-v>", lambda event: self.exclude_ids_entry.event_generate('<<Paste>>'))  # For macOS
 
         # Fetch Pages Limit
         ttk.Label(frame, text="Fetch Pages Limit:").grid(row=8, column=0, sticky="e", padx=5, pady=5)
@@ -115,7 +125,7 @@ class SettingsForm:
         # REST Auth Type
         ttk.Label(frame, text="REST Auth Type:").grid(row=15, column=0, sticky="e", padx=5, pady=5)
         self.rest_auth_type = tk.StringVar(value=self.config['credentials']['rest_auth_type'])
-        self.rest_auth_type_combobox = ttk.Combobox(frame, textvariable=self.rest_auth_type, values=self.REST_AUTH_TYPES, state="readonly",width=35)
+        self.rest_auth_type_combobox = ttk.Combobox(frame, textvariable=self.rest_auth_type, values=self.REST_AUTH_TYPES, state="readonly", width=35)
         self.rest_auth_type_combobox.grid(row=15, column=1, padx=5, pady=5, sticky="w")
         self.rest_auth_type_combobox.bind("<<ComboboxSelected>>", self.update_api_token_visibility)
         self.update_rest_auth_types()
@@ -136,7 +146,12 @@ class SettingsForm:
 
         self.set_edit_mode(False)
 
-
+    # Function to select all text
+    def select_all(self, event):
+        self.exclude_ids_entry.select_range(0, 'end')
+        self.exclude_ids_entry.icursor('end')
+        return 'break'  # Prevents default behavior
+        
     def validate_fields(self):
         valid = True
 
@@ -209,9 +224,12 @@ class SettingsForm:
         return re.match(email_regex, email) is not None
 
     def validate_exclude_ids(self, exclude_ids):
-        # Regex for validating a list of digits separated by commas
-        exclude_ids_regex = r'^(\d+)(,\d+)*$'
-        return re.match(exclude_ids_regex, exclude_ids) is not None
+        # Regex for validating a list of digits separated by commas allow optional space after comma
+        exclude_ids_list = exclude_ids.split(',')
+        for exclude_id in exclude_ids_list:
+            if not exclude_id.strip().isdigit():
+                return False
+        return True
 
     def set_edit_mode(self, edit_mode):
         self.edit_mode = edit_mode
@@ -277,7 +295,7 @@ class SettingsForm:
             'space_key': self.space_key_entry.get(),
             'root_page_id': self.root_page_id_entry.get(),
             'label': self.label_entry.get(),
-            'exclude_ids': self.exclude_ids_entry.get().split(','),
+            'exclude_ids': [id.strip() for id in self.exclude_ids_entry.get().split(',')],
             'fetch_pages_limit':self.fetch_pages_limit_entry.get(),
             'fetch_attachments_limit':self.fetch_attachments_limit_entry.get(),
             'credentials':{

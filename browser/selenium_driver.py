@@ -176,7 +176,9 @@ class ConfluenceBrowserClient:
         time.sleep(1)
 
         save_button = self.wait_and_find_element(target['save_button_selector_value'], target['save_button_selector_type'])
+        time.sleep(1)
         save_button.click()
+        time.sleep(1)
 
     def located_element(self, selector_value: str, selector_type: str):
         locator = self._get_by_selector(selector_type), selector_value
@@ -279,7 +281,7 @@ class ConfluenceBrowserClient:
             found_element.submit()
         logger.debug(f"Post-action {element.post_action} performed successfully")
         return found_element
-            
+
     def close_driver(self):
         if self.driver:
             self.driver.quit()

@@ -26,6 +26,7 @@ class ConfluenceAPIClient:
         self.use_v2_for_cloud = "v2" if self.instance_config.confluence_type == "cloud" else "v1"
         self.rest_api_path = "/wiki/rest/api/content" if self.instance_config.confluence_type == "cloud" else "/rest/api/content"
         self.logs_prefix = f"{self.instance_config.name} {self.instance_config.confluence_type}>"
+        self.logged_in = False
 
     def get_endpoint(self, category: str, action: str, api_version: str = "v1") -> str:
         return self.api_config.get(self.instance_config.confluence_type, {}).get(api_version, {}).get(category, {}).get(action, '')
@@ -80,6 +81,7 @@ class ConfluenceAPIClient:
             logger.debug(f"{self.logs_prefix} Using Authorization header: {'*' * len(self.session.headers.get('Authorization', ''))}")
         else:
             raise ValueError(f"{self.logs_prefix} Invalid Authentication Method: {auth_type}")
+        self.logged_in = True
 
     def api_request(self, method, category, action, api_version="v1", **kwargs):
         url = self.build_url(category, action, api_version, kwargs.get('path_params', {}))
@@ -151,7 +153,7 @@ class ConfluenceAPIClient:
     def create_content(self, data,space_key:str=None) -> dict:
         response = self.api_request('POST', 'content', 'create', self.use_v2_for_cloud, data=data)
         if response.status_code == 400:
-            logger.warning(f"{self.logs_prefix} Error Creating Page '{data['title']}' Reason: {response.json()['errors'][0]['title']}")
+            logger.warning(f"{self.logs_prefix} Error Creating Page '{data['title']}': {response.json()['errors'][0]['title']}")
             return self.get_page_id(title=data['title'],space_key=space_key)
         return response.json()['id']
 
@@ -209,7 +211,10 @@ class ConfluenceAPIClient:
         return self.api_request('GET', 'child', 'get', 'v1', path_params={'parentId': parent_id}, params=params).json()['results']
 
     def get_attachments(self, content_id) -> dict:
-        return self.api_request('GET','attachment','get','v1',path_params={'contentId':content_id})
+        params = {
+            'limit': self.instance_config.fetch_attachments_limit
+        }
+        return self.api_request('GET','attachment','get','v1',path_params={'contentId':content_id},params=params)
     
     def get_user_groups(self):
         response = self.api_request('GET', 'user', 'groups', 'v1', params={'limit': '100'})
@@ -234,16 +239,16 @@ class ConfluenceAPIClient:
                 logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} Edit Access Users: {edit_access_emails} Groups: {edit_access_groups}")
 
             if username in read_access_emails or len(read_access_emails) == 0:
-                # logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has read access")
+                logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has read access")
                 return True
             elif username in edit_access_emails or len(edit_access_emails) == 0:
-                # logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has edit access")
+                logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has edit access")
                 return True
             elif any(group in read_access_groups for group in self.current_user_memberships) or len(read_access_groups) == 0:
-                # logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has read access through group membership")
+                logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has read access through group membership")
                 return True
             elif any(group in edit_access_groups for group in self.current_user_memberships) or len(edit_access_groups) == 0:
-                # logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has edit access through group membership")
+                logger.debug(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} has edit access through group membership")
                 return True
             else:
                 logger.warning(f"{self.logs_prefix} PAGE_ID: {page_id} User {username} does not have read or edit access")

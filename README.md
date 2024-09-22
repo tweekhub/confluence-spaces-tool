@@ -34,10 +34,10 @@ This tool was tested by copying several thousand pages and attachments from a sp
 
 ## Known Issues
 
-* Cannot use `cookies_auth` with confluence cloud. This type of auth mechanism is used for download/exporting confluence pages as pdf or word documents.
-* Cannot use the `Copy Content (Source View)` Method of copying pages content from source to destination confluence space if the source view plugin is disabled in your confluence.
-* Cannot use the `Copy Content (Edit View)` Method of copying pages content to target confluence pages, if source pages uses sections view. 
-
+* `cookies_auth` is not supported with Confluence Cloud. This authentication method is used for downloading/exporting Confluence pages as PDF or Word documents.
+* The `Copy Content (Source View)` method cannot be used if the source view plugin is disabled in your Confluence instance.
+* The `Copy Content (Edit View)` method cannot copy all sections from the source tree properly,if the source pages utilize sections view.
+* When creating pages, if a page with the same title already exists in the target space, the tool will fetch the page ID from the existing page of target space and continue creating or copying pages under the existing page, even if it is outside the target tree. This may result in inconsistencies if you require pages to be created strictly within the target tree.
 
 ## Configuration
 

@@ -7,6 +7,7 @@ class StatsTable:
         "root_page_id": "n/a",
         "space_key": "n/a",
         "space_id": "n/a",
+        "total_pages": "n/a",
         "current_user_email": "n/a",
         "current_user_groups": ["n/a"],
         "total_pages_copied": "n/a",
@@ -86,8 +87,8 @@ class StatsTable:
     def update_stats(self, new_stats):
         for key, value in new_stats.items():
             if key in self.labels:
-                if key == "root_page_title" and len(value) > 55:
-                    value = f"{value[:55]}..."
+                # if key == "root_page_title" and len(value) > 55:
+                #     value = f"{value[:55]}..."
                 self.labels[key].config(text=value)
 
     def update_current_user_groups(self, current_user_groups):

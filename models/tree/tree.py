@@ -79,13 +79,13 @@ class ConfluencePagesTree:
             page = ConfluencePageNode.from_api_response(page_data, confluence_type)
 
             if str(page.id) in map(str, exclude_page_ids):
-                logger.warning(f"Skipping page {page.title} (ID: {page.id}) due to exclude_page_id match")
+                logger.warning(f"Skipping page {page.title} (ID: {page.id}) with all sub pages, due to exclude_page_id match")
                 continue
             
             page.labels = [label['name'] for label in self.api_client.get_labels(page.id)]
 
             if from_label and (not page.labels or from_label not in page.labels):
-                logger.warning(f"Skipping page {page.title} (ID: {page.id}) due to label filtering")
+                logger.warning(f"Skipping page {page.title} (ID: {page.id}) with all sub pages, due to label filtering")
                 continue
 
             logger.debug(f"Adding page {page.title} (ID: {page.id}) with labels: {page.labels}")
@@ -107,13 +107,19 @@ class ConfluencePagesTree:
         root_page_data = self.api_client.get_content(self.root.id)  # Ensure root is a valid ConfluencePageNode
         self.root = ConfluencePageNode.from_api_response(root_page_data.json(), confluence_type)  # Convert to ConfluencePageNode
         self.fetch_pages(confluence_type=confluence_type, from_label=from_label, exclude_page_ids=exclude_page_ids)
-        self.total_nodes = self.count_children()
+        
         logger.info(f"{self.logs_prefix} ConfluencePagesTree with root {self.root.title} with total of {self.total_nodes} nodes is ready...")
 
-    def count_children(self, node: Optional['ConfluencePageNode'] = None) -> int:
+    def count_children(self, node: ConfluencePageNode = None) -> int:
         current_node = node or self.root
         count = len(current_node.children)
         for child in current_node.children:
             if isinstance(child, ConfluencePageNode):
                 count += self.count_children(child)
         return count
+    
+    def fetch_total_nodes(self) -> int:
+        self.total_nodes = 0
+        child_nodes = self.count_children()
+        self.total_nodes += child_nodes + 1
+        return self.total_nodes
