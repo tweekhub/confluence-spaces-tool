@@ -14,11 +14,8 @@ class ConfluenceConfig:
         # Load source and target instances
         self.source_instance = self._load_confluence_instance(self.config_data.get('source'))
         self.target_instance = self._load_confluence_instance(self.config_data.get('target'))
-
     def _load_config(self, config_file: str) -> dict:
-        config_path = Path(config_file)
-        if not config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_file}")
+        config_path = self._get_file_path(config_file)
         with open(config_path, 'r') as file:
             try:
                 config = yaml.safe_load(file)
@@ -28,9 +25,7 @@ class ConfluenceConfig:
                 raise yaml.YAMLError(f"Error parsing YAML file: {e}")
 
     def _load_elements_config(self, config_file: str) -> Dict[str, Any]:
-        config_path = Path(config_file)
-        if not config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_file}")
+        config_path = self._get_file_path(config_file)
         with open(config_path, 'r') as file:
             try:
                 config: Dict[str, Any] = json.load(file)
@@ -40,9 +35,7 @@ class ConfluenceConfig:
                 raise json.JSONDecodeError(f"Error decoding JSON file: {e}")
 
     def _load_api_config(self, config_file: str) -> Dict[str, Any]:
-        config_path = Path(config_file)
-        if not config_path.exists():
-            raise FileNotFoundError(f"Configuration file not found: {config_file}")
+        config_path = self._get_file_path(config_file)
         with open(config_path, 'r') as file:
             try:
                 config: Dict[str, Any] = json.load(file)
@@ -51,12 +44,25 @@ class ConfluenceConfig:
             except json.JSONDecodeError as e:
                 raise json.JSONDecodeError(f"Error decoding JSON file: {e}")
 
+    def _get_file_path(self, file_name: str) -> Path:
+        if getattr(sys, 'frozen', False):
+            # If the application is run as a bundle, the PyInstaller bootloader
+            # extends the sys module by a flag frozen=True and sets the app 
+            # path into variable _MEIPASS.
+            base_path = Path(sys._MEIPASS)
+        else:
+            base_path = Path(__file__).parent.parent
+
+        file_path = base_path / file_name
+        if not file_path.exists():
+            raise FileNotFoundError(f"Configuration file not found: {file_path}")
+        return file_path
+
     def _load_confluence_instance(self, instance_data: dict):
         if not instance_data:
             raise ValueError("Missing Confluence instance data in the configuration.")
         logger.debug(f"Loading Confluence instance: {instance_data['name']}")
         return ConfluenceInstance(config_data=instance_data)
-    
     def find_instance_by_key(self, key: str):
         valid_keys = ['source', 'target']
         if key not in valid_keys:
