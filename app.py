@@ -213,6 +213,7 @@ class ConfluenceSpacesApp:
         if node is None:
             node = self.source_tree.root
         try:
+            logger.info(f"Creating page '{node.title}'")
             node.labels = [label['name'] for label in self.source_api_client.get_labels(node.id)]
             node.child_pages = self.source_api_client.get_child_pages(node.id)
             created_page_id = self._create_page(parent_id=parent_id, source_node=node, with_attachments=with_attachments)
@@ -225,7 +226,9 @@ class ConfluenceSpacesApp:
         self.source_tree.fetch_attachments(source_node)
         if len(source_node.child_attachments) > 0:
             for attachment in source_node.child_attachments:
+                logger.info(f"Downloading attachment '{attachment.title}' from page '{source_node.title}'")
                 file_path = self.source_api_client.download_attachment(source_node.id, attachment.title,f"{self.download_dir}/{self.source_instance.name}")
+                logger.info(f"Uploading attachment '{attachment.title}' to target page '{target_page_id}'")
                 self.target_api_client.create_attachment(content_id=target_page_id, attachment_name=attachment.title, file_path=file_path)
         else:
             logger.warning(f"No attachments Found for '{source_node.title}'")
@@ -272,7 +275,7 @@ class ConfluenceSpacesApp:
         return True
 
     def _perform_copy_paste(self, browser, source_node, new_node, edit_mode):
-        logger.debug(f"Title matches: {source_node.title}")
+        logger.info(f"Copying page '{source_node.title}' to '{new_node.title}'")
         if edit_mode:
             source_url = self._get_edit_url(self.source_instance.confluence_type, self.source_instance.site_url, source_node.edit_link, self.source_instance.space_key, source_node.id)
         else:
@@ -316,7 +319,7 @@ class ConfluenceSpacesApp:
             self.target_tree.rearrange_trees(self.source_tree.root)
             for source_node, new_node in zip(self.source_tree.traverse_tree(), self.target_tree.traverse_tree()):
                 if source_node.title == new_node.title:
-                    logger.debug(f"Title matches: {source_node.title}")
+                    logger.info(f"Copying attachments from page '{source_node.title}'")
                     self.download_and_upload_attachments(source_node, new_node.id)
             self._update_req_stats()
         return self.execute_with_stats_update(copy_logic, **kwargs)
@@ -326,6 +329,7 @@ class ConfluenceSpacesApp:
             logger.warn_tree_not_initialized(is_source=True)
             return 
         for page in self.source_tree.traverse_tree():
+            logger.info(f"Exporting pdf from page '{page.title}'")
             self.source_api_client.download_pdf(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
             self._update_req_stats()
 
@@ -334,6 +338,7 @@ class ConfluenceSpacesApp:
             logger.warn_tree_not_initialized(is_source=True)
             return 
         for page in self.source_tree.traverse_tree():
+            logger.info(f"Exporting word doc from page '{page.title}'")
             self.source_api_client.download_word(content_id=page.id, content_name=page.title, download_dir=f"{self.download_dir}/{self.source_instance.name}")
         self._update_req_stats()
 
@@ -345,6 +350,7 @@ class ConfluenceSpacesApp:
             self.source_tree.fetch_attachments(page)
             if len(page.child_attachments) > 0:
                 for attachment in page.child_attachments:
+                    logger.info(f"Downloading attachment '{attachment.title}' from page '{page.title}'")
                     file_path = self.source_api_client.download_attachment(page.id, attachment.title,f"{self.download_dir}/attachments/{self.source_api_client.safe_name(page.title)}")
                     logger.debug(f"Downloaded attachment to {file_path}")
         self._update_req_stats()
@@ -379,3 +385,5 @@ class ConfluenceSpacesApp:
             "successful_http_requests": self.target_api_client.total_success,
             "failed_http_requests": self.target_api_client.total_failed
         })).start()
+        self.source_api_client.requests_stats()
+        self.target_api_client.requests_stats()
