@@ -4,6 +4,8 @@ from pathlib import Path
 from config.config_types import UIElement, ConfluenceInstance
 from typing import Dict, Any, List, Optional
 import json
+import sys
+
 
 class ConfluenceConfig:
     def __init__(self, config_file: str,api_config_file:str,browser_config_file:str):
