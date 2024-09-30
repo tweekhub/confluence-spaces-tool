@@ -16,7 +16,7 @@ class ConfluencePagesTree:
 
     def _print_node(self, node: 'ConfluencePageNode', level: int, to_file: bool = False):
         indent = "    " * level
-        info_str = f"{indent}- {node.title} (ID: {node.id}, Labels: {node.labels}, Children: {len(node.child_pages)}, Macros: {set(node.macros)})"
+        info_str = f"{indent}- {node.title} (ID: {node.id}, Labels: {node.labels}, Children: {len(node.children)}, Macros: {set(node.macros)})"
         if to_file:
             with open(self.tree_file, "a") as file:
                 file.write(info_str + "\n")
@@ -82,13 +82,14 @@ class ConfluencePagesTree:
                 logger.warning(f"Skipping page {page.title} (ID: {page.id}) with all sub pages, due to exclude_page_id match")
                 continue
             
-            page.labels = [label['name'] for label in self.api_client.get_labels(page.id)]
-
             if from_label and (not page.labels or from_label not in page.labels):
                 logger.warning(f"Skipping page {page.title} (ID: {page.id}) with all sub pages, due to label filtering")
                 continue
 
+            page.labels = [label['name'] for label in self.api_client.get_labels(page.id)]
             logger.debug(f"Adding page {page.title} (ID: {page.id}) with labels: {page.labels}")
+            page.set_body(self.api_client.get_content(page.id).json().get("body",{}).get("storage",{}).get("value",""))
+            page.macros = page.get_macros_list()
             current_node.add_child(page)
             self.fetch_pages(page, confluence_type, from_label, exclude_page_ids)
 

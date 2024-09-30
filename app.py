@@ -67,7 +67,7 @@ class ConfluenceSpacesApp:
         updated_data = self.source_form.get_selected_values()
         self.source_instance.from_dict(updated_data)
         self.app_config.update_config({"source": self.source_instance.to_dict()})
-        logger.info(f"{self.source_instance.name} {self.source_instance.confluence_type}> Using {self.source_instance.credentials.rest_auth_type.title()}")
+        logger.info(f"{self.source_instance.name} {self.source_instance.confluence_type}> Using {self.source_instance.credentials.rest_auth_type.strip('_').title()}")
         if self.source_instance.credentials.rest_auth_type != "cookies_auth":
             self.source_api_client.initialize_session()
         else:
@@ -75,7 +75,7 @@ class ConfluenceSpacesApp:
             self.is_source_cookies_logged_in = True
         self.source_space_id = self.source_api_client.get_space_id(self.source_instance.space_key)
         self.source_stats.update_current_user_groups(self.source_api_client.get_user_groups())
-        self.source_stats.update_stats({"space_id": self.source_instance.space_key, "root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id)})
+        self.source_stats.update_stats({"space_id": self.source_space_id, "root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id)})
         self.source_stats.update_stats({"space_key": self.source_instance.space_key,"root_page_id": self.source_instance.root_page_id,"current_user_email": self.source_instance.credentials.email})
         self._update_req_stats()
 
@@ -90,7 +90,7 @@ class ConfluenceSpacesApp:
             self._initialize_browser_and_login(self.target_instance, self.target_api_client)
         self.target_space_id = self.target_api_client.get_space_id(self.target_instance.space_key)
         self.target_stats.update_current_user_groups(self.target_api_client.get_user_groups())
-        self.target_stats.update_stats({"space_id": self.target_instance.space_key, "root_page_title": self.target_api_client.get_page_title(self.target_instance.root_page_id)})
+        self.target_stats.update_stats({"space_id": self.target_space_id, "root_page_title": self.target_api_client.get_page_title(self.target_instance.root_page_id)})
         self.target_stats.update_stats({"space_key": self.target_instance.space_key,"root_page_id": self.target_instance.root_page_id,"current_user_email": self.target_instance.credentials.email})
         self._update_req_stats()
 
@@ -109,7 +109,7 @@ class ConfluenceSpacesApp:
         self.source_tree.print_pages()
         self.source_space_id = self.source_api_client.get_space_id(self.source_instance.space_key)
         self.source_stats.update_current_user_groups(self.source_api_client.get_user_groups())
-        self.source_stats.update_stats({"space_id": self.source_instance.space_key, "root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id),"total_pages": self.source_tree.fetch_total_nodes()})
+        self.source_stats.update_stats({"space_id": self.source_space_id, "root_page_title": self.source_api_client.get_page_title(self.source_instance.root_page_id),"total_pages": self.source_tree.fetch_total_nodes()})
         self.actions_section.update_button_state("save", "readonly", "normal")
         self.actions_section.update_button_state("create_pages", "readonly", "normal")
         self.actions_section.update_button_state("copy_pages", "readonly", "normal")
@@ -132,7 +132,7 @@ class ConfluenceSpacesApp:
         self.target_tree.print_pages()
         self.target_space_id = self.target_api_client.get_space_id(self.target_instance.space_key)
         self.target_stats.update_current_user_groups(self.target_api_client.get_user_groups())
-        self.target_stats.update_stats({"space_id": self.target_instance.space_key, "root_page_title": self.target_api_client.get_page_title(self.target_instance.root_page_id),"total_pages": self.target_tree.fetch_total_nodes()})
+        self.target_stats.update_stats({"space_id": self.target_space_id, "root_page_title": self.target_api_client.get_page_title(self.target_instance.root_page_id),"total_pages": self.target_tree.fetch_total_nodes()})
         self.actions_section.update_button_state("save", "readonly", "normal")
         self._update_req_stats()
 
@@ -179,11 +179,6 @@ class ConfluenceSpacesApp:
             # Stop the real-time stats update once page creation is done
             stop_event.set()  # Signal the stats thread to stop
             stats_thread.join()  # Wait for the stats thread to finish
-        # Final update of the stats after the creation process
-        self.target_stats.update_stats({
-            "total_pages_created": self.target_api_client.total_pages_created,
-            "total_attachments_created": self.target_api_client.total_attachments_created
-        })
         self._update_req_stats()  # Final stats update
         
     def _create_page(self,parent_id,source_node: ConfluencePageNode,with_attachments: bool = False):
@@ -377,5 +372,3 @@ class ConfluenceSpacesApp:
             "successful_http_requests": self.target_api_client.total_success,
             "failed_http_requests": self.target_api_client.total_failed
         })).start()
-        self.source_api_client.requests_stats()
-        self.target_api_client.requests_stats()

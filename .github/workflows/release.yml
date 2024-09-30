@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - main
 env:
   RELEASE_TAG: "v1.0.0"
   

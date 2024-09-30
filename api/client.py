@@ -121,12 +121,12 @@ class ConfluenceAPIClient:
                 download_doc=(category == 'export' and action == 'word'),
                 download_attachment=(category == 'attachment' and action == 'download')
             )
-            if action != "export":
-                logger.debug(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:150]}...")
+            if action not in ["export","download"]:
+                logger.debug(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:250]}...")
         else:
             self.update_request_stats(is_successful=False)
-            if action != "export":
-                logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:250]}...")
+            if action not in ["export","download"]:
+                logger.warning(f"{self.logs_prefix} HTTP_RES {response.status_code} MESSAGE: {response.text[:350]}...")
 
 
     def get_space_id(self, space_key) -> dict:
@@ -167,6 +167,7 @@ class ConfluenceAPIClient:
             return True
         except etree.XMLSyntaxError:
             return False
+
     def get_labels(self, content_id):
         return self.api_request('GET', 'label', 'get', 'v1', path_params={'contentId': content_id}).json()['results']
     
@@ -180,7 +181,8 @@ class ConfluenceAPIClient:
 
     def get_child_pages(self, parent_id):
         params = {
-            'limit': self.instance_config.fetch_pages_limit
+            'limit': self.instance_config.fetch_pages_limit,
+            'expand': 'body.storage'
         }
         return self.api_request('GET', 'child', 'get', 'v1', path_params={'parentId': parent_id}, params=params).json()['results']
 
@@ -326,7 +328,7 @@ class ConfluenceAPIClient:
             cwd = Path.cwd()
             file_path = cwd / download_dir / safe_filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            
+            os.chmod(cwd, 0o777)  # Ensure write permissions
             with open(file_path, 'wb') as f:
                 f.write(content)
             

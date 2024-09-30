@@ -10,7 +10,7 @@ def parse_arguments():
     parser.add_argument("--browser-config-file", default="confluence-elements.json", help="Specify the path to the UI elements configuration file")
     parser.add_argument("--download-dir", default="downloads", type=str, help="Specify the directory to download files")
 
-    parser.add_argument("--log-level", default="info", choices=["debug", "info", "warning", "error"], help="Set the logging levels")
+    parser.add_argument("--log-level", default="debug", choices=["debug", "info", "warning", "error"], help="Set the logging levels")
     parser.add_argument("--log-file", default="confluence-Spaces.log", help="Specify the path to the log file for the Spacesprocess")
     parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
     return parser.parse_args()
